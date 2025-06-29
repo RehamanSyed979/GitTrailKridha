@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Kridha Realty</title>
+  <link href="styles1.css" rel="stylesheet" type="text/css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="auth.js"></script>
+  <script src="auth-ui.js"></script>
+  <style>
+    .admin-container {
+      max-width: 900px;
+      margin: 3rem auto;
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---background-color--bg-primary,#fff);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 2.5rem 2rem;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .admin-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-logout {
+      font-size: 1rem;
+      color: #fff;
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      cursor: pointer;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .admin-table th, .admin-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    .admin-table th {
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---background-color--bg-secondary,#f6f6f6);
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-table select, .admin-table button {
+      font-size: 1rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.4rem;
+      border: 1px solid #ccc;
+      margin-right: 0.5rem;
+    }
+    .admin-table button {
+      background: #fff;
+      color: #3c0087;
+      border: 1px solid #3c0087;
+      transition: background 0.2s, color 0.2s;
+    }
+    .admin-table button:hover {
+      background: #3c0087;
+      color: #fff;
+    }
+    .admin-add-user {
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    .admin-add-user input {
+      min-width: 160px;
+    }
+    .admin-section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem 0;
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-info {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .admin-container { padding: 1rem 0.5rem; }
+      .admin-header { flex-direction: column; gap: 1rem; }
+      .admin-add-user { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <div class="admin-title">Admin Panel</div>
+      <button class="admin-logout" id="admin-logout">Logout</button>
+    </div>
+    <div class="admin-info">Manage users, roles, and privileges. Only admins can access this page.</div>
+    <div class="admin-section-title">Add New User</div>
+    <form id="admin-add-user" class="admin-add-user">
+      <input class="input w-input" id="add-name" type="text" required placeholder="Full Name" />
+      <input class="input w-input" id="add-email" type="email" required placeholder="Email" />
+      <input class="input w-input" id="add-password" type="password" required placeholder="Password" />
+      <select class="input w-input" id="add-role">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="button primary-button" type="submit">Add User</button>
+    </form>
+    <div class="admin-section-title">All Users</div>
+    <div id="admin-users-list"></div>
+  </div>
+  <script>
+    // Only allow admin
+    $(function() {
+      const user = localStorage.getItem('kridha_current_user');
+      if (!user) { window.location = 'index.html'; return; }
+      const u = JSON.parse(user);
+      if (u.role !== 'admin') { window.location = 'index.html'; return; }
+      renderAdminUsers();
+      $('#admin-logout').on('click', function() {
+        localStorage.removeItem('kridha_current_user');
+        window.location = 'index.html';
+      });
+      $('#admin-add-user').on('submit', function(e) {
+        e.preventDefault();
+        const name = $('#add-name').val();
+        const email = $('#add-email').val();
+        const password = $('#add-password').val();
+        const role = $('#add-role').val();
+        if (!window.kridhaAuth.registerUser(email, password, name)) {
+          alert('Email already registered');
+        } else {
+          window.kridhaAuth.setUserRole(email, role);
+          renderAdminUsers();
+          this.reset();
+        }
+      });
+    });
+    function renderAdminUsers() {
+      const users = window.kridhaAuth.getAllUsers();
+      let html = '<table class="admin-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>';
+      users.forEach(u => {
+        html += `<tr><td>${u.name||''}</td><td>${u.email}</td><td><select data-email="${u.email}"><option value="user"${u.role==='user'?' selected':''}>User</option><option value="admin"${u.role==='admin'?' selected':''}>Admin</option></select></td><td>${u.email!=='admin@kridha.com'?`<button data-del="${u.email}">Delete</button>`:''}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      $('#admin-users-list').html(html);
+      // Role change
+      $('#admin-users-list select').on('change', function() {
+        const email = $(this).data('email');
+        const role = $(this).val();
+        window.kridhaAuth.setUserRole(email, role);
+        renderAdminUsers();
+      });
+      // Delete user
+      $('#admin-users-list button[data-del]').on('click', function() {
+        const email = $(this).data('del');
+        if (confirm('Delete user ' + email + '?')) {
+          window.kridhaAuth.deleteUser(email);
+          renderAdminUsers();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
