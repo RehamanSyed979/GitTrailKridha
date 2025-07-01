@@ -4,8 +4,8 @@ $(function() {
   function hideModal(id) { $(id).hide(); }
 
   // Open modals
-  $('#open-signin-modal').on('click', function() { showModal('#signin-modal'); });
-  $('#open-signup-modal').on('click', function() { showModal('#signup-modal'); });
+  $(document).on('click', '#open-signin-modal', function() { showModal('#signin-modal'); });
+  $(document).on('click', '#open-signup-modal', function() { showModal('#signup-modal'); });
   $('#close-signin-modal').on('click', function() { hideModal('#signin-modal'); });
   $('#close-signup-modal').on('click', function() { hideModal('#signup-modal'); });
   // Admin modal removed; now handled by admin.html page link
@@ -22,12 +22,14 @@ $(function() {
       $('#user-greeting').text('Hello, ' + user.name).show();
       $('#open-signin-modal, #open-signup-modal').hide();
       $('#profile-icon-btn').show();
+      $('.profile-dropdown-wrapper').show();
       if (user.role === 'admin') $('#open-admin-modal').show();
       else $('#open-admin-modal').hide();
     } else {
       $('#user-greeting').hide();
       $('#open-signin-modal, #open-signup-modal').show();
-      $('#profile-icon-btn').show();
+      $('#profile-icon-btn').hide();
+      $('.profile-dropdown-wrapper').hide();
       $('#open-admin-modal').hide();
     }
     // Hide logout button in nav, show only in dropdown
@@ -52,35 +54,234 @@ $(function() {
     setAuthUI(user);
   }
 
-  // Sign In
-  $('#signin-form').on('submit', function(e) {
+  // Sign In Tabs
+  $('#signin-tab-email').on('click', function() {
+    $('#signin-tab-email').addClass('primary-button').removeClass('secondary-button');
+    $('#signin-tab-otp').addClass('secondary-button').removeClass('primary-button');
+    $('#signin-form-email').show();
+    $('#signin-form-otp').hide();
+    $('#signin-error').hide();
+  });
+  $('#signin-tab-otp').on('click', function() {
+    $('#signin-tab-otp').addClass('primary-button').removeClass('secondary-button');
+    $('#signin-tab-email').addClass('secondary-button').removeClass('primary-button');
+    $('#signin-form-email').hide();
+    $('#signin-form-otp').show();
+    $('#signin-error').hide();
+  });
+  // Default to email tab
+  $('#signin-tab-email').click();
+
+  // Email/Password Sign In (delegated handler for dynamic DOM)
+  $(document).off('submit', '#signin-form-email').on('submit', '#signin-form-email', function(e) {
     e.preventDefault();
     const email = $('#signin-email').val();
     const password = $('#signin-password').val();
-    const user = window.kridhaAuth.loginUser(email, password);
-    if (user) {
-      setCurrentUser(user);
-      hideModal('#signin-modal');
-      $('#signin-error').hide();
-    } else {
-      $('#signin-error').text('Invalid email or password').show();
+    const $btn = $('#signin-form-email button[type="submit"]');
+    $btn.prop('disabled', true).text('Signing In...');
+    window.kridhaAuth.loginUser(email, password).then(user => {
+      $btn.prop('disabled', false).text('Sign In');
+      if (user) {
+        setCurrentUser(user);
+        hideModal('#signin-modal');
+        $('#signin-error').hide();
+      } else {
+        $('#signin-error').text('Invalid email or password').show();
+      }
+    }).catch(() => {
+      $btn.prop('disabled', false).text('Sign In');
+      $('#signin-error').text('Sign in failed. Please try again.').show();
+    });
+  });
+
+  // Mobile OTP Sign In
+  let signinConfirmationResult = null;
+  let signinVerifiedMobile = null;
+  // Setup reCAPTCHA for sign-in OTP
+  window.signinRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('signin-recaptcha-container', {
+    'size': 'normal',
+    'callback': function(response) {
+      // reCAPTCHA solved
+    }
+  });
+  $('#signin-send-otp-btn').on('click', function() {
+    const mobile = $('#signin-mobile').val();
+    if (!/^\d{10}$/.test(mobile)) {
+      $('#signin-error').text('Enter a valid 10-digit mobile number').show();
+      return;
+    }
+    $('#signin-error').hide();
+    const phoneNumber = '+91' + mobile; // Change country code if needed
+    firebase.auth().signInWithPhoneNumber(phoneNumber, window.signinRecaptchaVerifier)
+      .then(function(result) {
+        signinConfirmationResult = result;
+        $('#signin-otp-section').show();
+        $('#signin-send-otp-btn').prop('disabled', true);
+      })
+      .catch(function(error) {
+        $('#signin-error').text(error.message || 'Failed to send OTP').show();
+      });
+  });
+  $('#signin-verify-otp-btn').on('click', function() {
+    const $btn = $(this);
+    const otp = $('#signin-otp').val();
+    if (!otp) {
+      $('#signin-error').text('Enter OTP').show();
+      return;
+    }
+    if (!signinConfirmationResult) {
+      $('#signin-error').text('Please request OTP first').show();
+      return;
+    }
+    $btn.prop('disabled', true).text('Verifying...');
+    signinConfirmationResult.confirm(otp)
+      .then(function(result) {
+        $('#signin-error').hide();
+        signinVerifiedMobile = $('#signin-mobile').val();
+        // Now call backend to get user by mobile
+        fetch('http://localhost:3000/api/login-mobile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mobile: signinVerifiedMobile })
+        })
+        .then(async res => {
+          let data = {};
+          try {
+            data = await res.json();
+          } catch (e) {
+            data = { error: 'Unexpected server response' };
+          }
+          if (res.ok && data.user) {
+            setCurrentUser(data.user);
+            hideModal('#signin-modal');
+            // Reset OTP form and section
+            $('#signin-form-otp')[0].reset();
+            $('#signin-otp-section').hide();
+            $('#signin-send-otp-btn').prop('disabled', false);
+            $btn.prop('disabled', false).text('Verify OTP & Sign In');
+          } else {
+            $('#signin-error').text(data.error || 'Mobile not registered').show();
+            $btn.prop('disabled', false).text('Verify OTP & Sign In');
+          }
+        })
+        .catch(() => {
+          $('#signin-error').text('Server error. Please try again.').show();
+          $btn.prop('disabled', false).text('Verify OTP & Sign In');
+        });
+      })
+      .catch(function(error) {
+        $btn.prop('disabled', false).text('Verify OTP & Sign In');
+        $('#signin-error').text(error.message || 'Invalid OTP').show();
+        // If code expired or used, allow user to resend OTP
+        if (error.code === 'auth/code-expired' || error.code === 'auth/invalid-verification-code') {
+          $('#signin-otp-section').hide();
+          $('#signin-send-otp-btn').prop('disabled', false);
+        }
+      });
+  });
+  // Cancel button for OTP form
+  $('#close-signin-modal-otp').on('click', function() {
+    hideModal('#signin-modal');
+    // Reset OTP form
+    $('#signin-form-otp')[0].reset();
+    $('#signin-otp-section').hide();
+    $('#signin-send-otp-btn').prop('disabled', false);
+    $('#signin-error').hide();
+  });
+
+  // --- Firebase Phone Auth Integration ---
+  // Add Firebase SDK via <script> in your HTML or use import if using modules
+  // Example assumes Firebase SDK is loaded globally as firebase
+  let verifiedMobile = null;
+  let confirmationResult = null;
+
+  // Setup reCAPTCHA
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    'size': 'normal',
+    'callback': function(response) {
+      // reCAPTCHA solved
     }
   });
 
-  // Sign Up
-  $('#signup-form').on('submit', function(e) {
+  // Use delegated event handler for send-otp-btn to ensure it always works
+  $(document).off('click', '#send-otp-btn').on('click', '#send-otp-btn', function() {
+    const mobile = $('#signup-mobile').val();
+    if (!/^\d{10}$/.test(mobile)) {
+      $('#signup-error').text('Enter a valid 10-digit mobile number').show();
+      return;
+    }
+    $('#signup-error').hide();
+    const phoneNumber = '+91' + mobile; // Change country code if needed
+    firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+      .then(function(result) {
+        confirmationResult = result;
+        $('#otp-section').show();
+        $('#send-otp-btn').prop('disabled', true);
+      })
+      .catch(function(error) {
+        $('#signup-error').text(error.message || 'Failed to send OTP').show();
+      });
+  });
+
+  // Use delegated event handler for verify-otp-btn to ensure it always works
+  $(document).off('click', '#verify-otp-btn').on('click', '#verify-otp-btn', function() {
+    const $btn = $(this);
+    const otp = $('#signup-otp').val();
+    if (!otp) {
+      $('#signup-error').text('Enter OTP').show();
+      return;
+    }
+    if (!confirmationResult) {
+      $('#signup-error').text('Please request OTP first').show();
+      return;
+    }
+    $btn.prop('disabled', true).text('Verifying...');
+    confirmationResult.confirm(otp)
+      .then(function(result) {
+        $('#signup-error').hide();
+        $('#signup-mobile-form').hide();
+        $('#signup-form').show();
+        verifiedMobile = $('#signup-mobile').val();
+        $btn.prop('disabled', false).text('Verify OTP');
+      })
+      .catch(function(error) {
+        $btn.prop('disabled', false).text('Verify OTP');
+        $('#signup-error').text(error.message || 'Invalid OTP').show();
+        // If code expired or used, allow user to resend OTP
+        if (error.code === 'auth/code-expired' || error.code === 'auth/invalid-verification-code') {
+          $('#otp-section').hide();
+          $('#send-otp-btn').prop('disabled', false);
+        }
+      });
+  });
+
+  // Sign Up (after OTP verified)
+  $('#signup-form').off('submit').on('submit', async function(e) {
     e.preventDefault();
     const name = $('#signup-name').val();
     const email = $('#signup-email').val();
     const password = $('#signup-password').val();
-    if (!window.kridhaAuth.registerUser(email, password, name)) {
-      $('#signup-error').text('Email already registered').show();
-    } else {
-      $('#signup-error').hide();
-      hideModal('#signup-modal');
-      // Delay showing the success modal to ensure modal stack is correct
-      setTimeout(showSignupSuccessModal, 100);
+    if (!verifiedMobile) {
+      // Reset to mobile/OTP step and show error
+      $('#signup-form').hide();
+      $('#signup-mobile-form').show();
+      $('#signup-error').text('Please verify your mobile number first').show();
+      return;
     }
+    fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile: verifiedMobile, email, password, name })
+    }).then(async res => {
+      if (res.ok) {
+        $('#signup-error').hide();
+        hideModal('#signup-modal');
+        setTimeout(showSignupSuccessModal, 100);
+      } else {
+        const data = await res.json();
+        $('#signup-error').text(data.error || 'Registration failed').show();
+      }
+    });
   });
 
   // Show signup success modal instead of alert

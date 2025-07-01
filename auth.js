@@ -2,11 +2,11 @@
 // Backend API base URL
 const API_BASE = 'http://localhost:3000/api';
 
-async function registerUser(email, password, name) {
+async function registerUser(mobile, email, password, name) {
   const res = await fetch(`${API_BASE}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, name })
+    body: JSON.stringify({ mobile, email, password, name })
   });
   return res.ok;
 }
