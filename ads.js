@@ -326,9 +326,19 @@ function renderAds(ads) {
     // Button styles
     const btnSize = '38px';
     const btnGap = '10px';
+    // Fix: Always use absolute URL for images if not already absolute
+    let imgUrl = (ad.images && ad.images[0]) || 'images/image1.avif';
+    if (imgUrl && !/^https?:\/\//i.test(imgUrl) && !imgUrl.startsWith('data:')) {
+      // If running on Vercel or any domain, use API_BASE as origin for uploads
+      if (imgUrl.startsWith('/')) {
+        imgUrl = API_BASE.replace(/\/api$/, '') + imgUrl;
+      } else {
+        imgUrl = API_BASE.replace(/\/api$/, '') + '/' + imgUrl;
+      }
+    }
     return `
       <div class="property-card" data-ad-id="${ad._id}" style="position:relative;">
-        <img src="${(ad.images && ad.images[0]) || 'images/image1.avif'}" alt="Property Image">
+        <img src="${imgUrl}" alt="Property Image">
         <div class="property-action-fab-group" style="position:absolute;top:16px;right:16px;display:flex;flex-direction:column;align-items:end;z-index:2;pointer-events:none;">
           <div class="property-action-fab" style="display:flex;flex-direction:column;align-items:end;gap:${btnGap};pointer-events:auto;background:transparent;">
             <button class="fav-btn${isFav ? ' active' : ''}" data-id="${ad._id}" aria-pressed="${isFav}" title="Favorite" style="width:${btnSize};height:${btnSize};background:#fff;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 1px 4px #bcb3f7;transition:background 0.2s;margin:0 0 0 0;">${isFav ? '❤️' : '🤍'}</button>
