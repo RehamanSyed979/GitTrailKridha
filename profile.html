@@ -61,6 +61,9 @@
       <div id="profile-form-status" class="profile-success" style="display:none;"></div>
       <div id="profile-form-error" class="profile-error" style="display:none;"></div>
     </form>
+    <div id="admin-panel-row" style="text-align:center;display:none;margin-bottom:1.5rem;">
+      <button class="button primary-button" id="adminPanelBtn" type="button" style="background:#c2185b;color:#fff;padding:10px 32px;border-radius:6px;font-size:1em;">Admin Panel</button>
+    </div>
     <div class="profile-section-title">Advanced</div>
     <div class="form-row">
       <label for="profile-current-password">Current Password (for sensitive changes)</label>
@@ -72,8 +75,16 @@
       <div id="delete-account-status" class="profile-success" style="display:none;"></div>
       <div id="delete-account-error" class="profile-error" style="display:none;"></div>
     </div>
+    <div style="text-align:center;margin-top:2.5rem;">
+      <button class="button primary-button" id="logout-btn" type="button" style="background:#512da8;color:#fff;padding:10px 32px;border-radius:6px;font-size:1em;">Logout</button>
+    </div>
   </div>
   <script>
+    document.getElementById('logout-btn').onclick = function() {
+      localStorage.removeItem('kridha_current_user');
+      if (window.currentUser) window.currentUser = null;
+      window.location.href = 'index.html';
+    };
     // Profile page JS logic will be in profile.js
   </script>
 </body>

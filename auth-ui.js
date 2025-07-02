@@ -49,8 +49,13 @@ $(function() {
     return u ? JSON.parse(u) : null;
   }
   function setCurrentUser(user) {
-    if (user) localStorage.setItem('kridha_current_user', JSON.stringify(user));
-    else localStorage.removeItem('kridha_current_user');
+    if (user && user._id) {
+      localStorage.setItem('kridha_current_user', JSON.stringify(user));
+      window.currentUser = user;
+    } else {
+      localStorage.removeItem('kridha_current_user');
+      window.currentUser = null;
+    }
     setAuthUI(user);
   }
 
@@ -79,16 +84,26 @@ $(function() {
     const password = $('#signin-password').val();
     const $btn = $('#signin-form-email button[type="submit"]');
     $btn.prop('disabled', true).text('Signing In...');
-    window.kridhaAuth.loginUser(email, password).then(user => {
+    // Use fetch directly to ensure we get the full user object with _id
+    fetch('http://localhost:3000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    .then(async res => {
       $btn.prop('disabled', false).text('Sign In');
-      if (user) {
-        setCurrentUser(user);
+      let data = {};
+      try { data = await res.json(); } catch (e) { data = { error: 'Unexpected server response' }; }
+      if (res.ok && data.user) {
+        setCurrentUser(data.user);
         hideModal('#signin-modal');
         $('#signin-error').hide();
+        window.location.href = 'home.html';
       } else {
-        $('#signin-error').text('Invalid email or password').show();
+        $('#signin-error').text(data.error || 'Invalid email or password').show();
       }
-    }).catch(() => {
+    })
+    .catch(() => {
       $btn.prop('disabled', false).text('Sign In');
       $('#signin-error').text('Sign in failed. Please try again.').show();
     });
@@ -159,6 +174,7 @@ $(function() {
             $('#signin-otp-section').hide();
             $('#signin-send-otp-btn').prop('disabled', false);
             $btn.prop('disabled', false).text('Verify OTP & Sign In');
+            window.location.href = 'home.html';
           } else {
             $('#signin-error').text(data.error || 'Mobile not registered').show();
             $btn.prop('disabled', false).text('Verify OTP & Sign In');

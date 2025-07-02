@@ -1,16 +1,12 @@
-// ...existing code...
-
-// Place this route after all app/express/mongoose setup:
-// Mobile OTP Login (returns user by mobile, for Firebase OTP flow)
-// (MUST be after User model is defined and app is initialized)
-
-// ...existing code...
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
@@ -25,7 +21,8 @@ const userSchema = new mongoose.Schema({
   password: String,
   name: String,
   role: { type: String, default: 'user' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ad' }]
 });
 // In-memory OTP store (for demo only)
 const otpStore = {};
@@ -100,7 +97,8 @@ app.post('/api/login', async (req, res) => {
         email: 'admin@kridha.com',
         password: await bcrypt.hash('Admin123', 10),
         name: 'Admin',
-        role: 'admin'
+        role: 'admin',
+        favorites: [] // Ensure favorites array is initialized
       });
       await user.save();
       console.log('Master admin created in DB');
@@ -110,8 +108,10 @@ app.post('/api/login', async (req, res) => {
       console.log('Master admin password incorrect');
       return res.status(400).json({ error: 'Invalid credentials' });
     }
+    // --- FIX: Do NOT reset favorites on login, always return the current favorites array ---
+    // Return full user object (including _id and favorites)
     console.log('Master admin login success');
-    return res.json({ success: true, user: { email: 'admin@kridha.com', name: 'Admin', role: 'admin' } });
+    return res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile, favorites: user.favorites || [] } });
   }
   // Normal user login
   console.log('Normal user login attempt');
@@ -126,7 +126,8 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
   console.log('Normal user login success');
-  res.json({ success: true, user: { email: user.email, name: user.name, role: user.role } });
+  // Return full user object (including _id)
+  res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile } });
 });
 
 // Get all users (admin only)
@@ -162,6 +163,116 @@ app.post('/api/login-mobile', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+
+// --- Property Ads API ---
+const Ad = require('./adModel');
+
+// Get all ads (optionally filter by location)
+app.get('/api/ads', async (req, res) => {
+  const { location } = req.query;
+  let filter = {};
+  if (location) filter.location = location;
+  const ads = await Ad.find(filter).populate('seller', 'name email mobile');
+  res.json(ads);
+});
+
+// Post a new ad (seller only)
+app.post('/api/ads', async (req, res) => {
+  try {
+    const { title, description, price, location, images, sellerId } = req.body;
+    if (!title || !price || !sellerId) return res.status(400).json({ error: 'Missing required fields' });
+    const ad = new Ad({ title, description, price, location, images, seller: sellerId });
+    await ad.save();
+    res.json({ success: true, ad });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --- Favorites API ---
+// Add/remove favorite ad for user
+app.post('/api/favorite', async (req, res) => {
+  const { userId, adId } = req.body;
+  if (!userId || !adId) return res.status(400).json({ error: 'Missing userId or adId' });
+  const user = await User.findById(userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  user.favorites = user.favorites || [];
+  // Ensure all favorites are stored as ObjectId (not string)
+  const adIdObj = mongoose.Types.ObjectId(adId);
+  const idx = user.favorites.findIndex(fav => fav.toString() === adIdObj.toString());
+  if (idx === -1) {
+    user.favorites.push(adIdObj);
+    await user.save();
+    return res.json({ success: true, action: 'added' });
+  } else {
+    user.favorites.splice(idx, 1);
+    await user.save();
+    return res.json({ success: true, action: 'removed' });
+  }
+});
+
+// Get user's favorite ads
+app.get('/api/favorites', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'Missing userId' });
+  const user = await User.findById(userId);
+  if (!user || !user.favorites) return res.json([]);
+  const ads = await Ad.find({ _id: { $in: user.favorites } });
+  res.json(ads);
+});
+
+// --- Image Upload Endpoint (using multer) ---
+// Delete an ad by ID
+// (mongoose is already required at the top, do not require again)
+app.delete('/api/ads/:id', async (req, res) => {
+  try {
+    const adId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(adId)) {
+      return res.status(400).json({ error: 'Invalid ad ID' });
+    }
+    const ad = await Ad.findByIdAndDelete(adId);
+    if (!ad) return res.status(404).json({ error: 'Ad not found' });
+    // Delete associated images from uploads folder
+    if (ad.images && Array.isArray(ad.images)) {
+      ad.images.forEach(imgPath => {
+        try {
+          // Remove leading slash if present
+          const imgFile = imgPath.startsWith('/uploads/') ? imgPath.slice(1) : imgPath;
+          const fullPath = path.join(__dirname, '../', imgFile);
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        } catch (imgErr) {
+          console.error('Failed to delete image:', imgPath, imgErr);
+        }
+      });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting ad:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
+  }
+});
+const upload = multer({ storage });
+app.use('/uploads', express.static(uploadDir));
+app.post('/api/upload', upload.array('images', 10), (req, res) => {
+  if (!req.files || !req.files.length) {
+    return res.status(400).json({ error: 'No files uploaded' });
+  }
+  const urls = req.files.map(f => `/uploads/${f.filename}`);
+  res.json({ urls });
 });
 
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));

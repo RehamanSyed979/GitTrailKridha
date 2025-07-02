@@ -2,6 +2,21 @@
 // Handles: edit username, change email, change password, upload/change/remove profile picture, delete account
 
 document.addEventListener('DOMContentLoaded', function () {
+  // Show Admin Panel button for admins
+  try {
+    const userStr = localStorage.getItem('kridha_current_user');
+    const userObj = userStr ? JSON.parse(userStr) : null;
+    if (userObj && userObj.role === 'admin') {
+      const adminPanelRow = document.getElementById('admin-panel-row');
+      const adminPanelBtn = document.getElementById('adminPanelBtn');
+      if (adminPanelRow) adminPanelRow.style.display = '';
+      if (adminPanelBtn) {
+        adminPanelBtn.onclick = function() {
+          window.location.href = 'admin.html';
+        };
+      }
+    }
+  } catch (e) { /* ignore */ }
   // Elements
   const avatarImg = document.getElementById('profile-avatar');
   const avatarUpload = document.getElementById('avatar-upload');
