@@ -284,7 +284,7 @@ $(function() {
       $('#signup-error').text('Please verify your mobile number first').show();
       return;
     }
-    fetch(window.API_BASE_URL ? window.API_BASE_URL + '/register' : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api/register' : `${window.location.protocol}//${window.location.hostname}:3000/api/register`), {
+    fetch(window.API_BASE_URL ? window.API_BASE_URL + '/api/register' : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api/register' : `${window.location.protocol}//${window.location.hostname}:3000/api/register`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile: verifiedMobile, email, password, name })
