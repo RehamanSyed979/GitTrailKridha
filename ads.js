@@ -68,10 +68,11 @@ async function loadAds() {
 // ads.js - Handles fetching, rendering, favorites, and posting ads
 // Change this to your backend server's URL and port
 // Use dynamic API base URL for all API calls
-const API_BASE = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL + '/api' :
-  (window && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3000/api'
-    : `${window.location.protocol}//${window.location.hostname}:3000/api`);
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE_URL)
+  ? window.API_BASE_URL + '/api'
+  : ((window && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+      ? 'http://localhost:3000/api'
+      : (window.location.protocol + '//' + window.location.hostname + '/api'));
 let currentUser = null; // Set this after login
 // Patch: Always sync currentUser from window/global/localStorage
 function syncCurrentUser() {
