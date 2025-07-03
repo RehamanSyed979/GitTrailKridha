@@ -154,7 +154,7 @@ $(function() {
         $('#signin-error').hide();
         signinVerifiedMobile = $('#signin-mobile').val();
         // Now call backend to get user by mobile
-        fetch('http://localhost:3000/api/login-mobile', {
+        fetch(window.API_BASE_URL ? window.API_BASE_URL + '/login-mobile' : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api/login-mobile' : `${window.location.protocol}//${window.location.hostname}:3000/api/login-mobile`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mobile: signinVerifiedMobile })
