@@ -333,12 +333,14 @@ function renderAds(ads) {
     const btnGap = '10px';
     // Fix: Always use absolute URL for images if not already absolute
     let imgUrl = (ad.images && ad.images[0]) || 'images/image1.avif';
+    // Always use backend domain for uploaded images
     if (imgUrl && !/^https?:\/\//i.test(imgUrl) && !imgUrl.startsWith('data:')) {
-      // If running on Vercel or any domain, use API_BASE as origin for uploads
-      if (imgUrl.startsWith('/')) {
-        imgUrl = API_BASE.replace(/\/api$/, '') + imgUrl;
+      if (imgUrl.startsWith('/uploads/')) {
+        // Always use backend domain for uploads
+        imgUrl = (window.API_BASE_URL || '').replace(/\/$/, '') + imgUrl;
       } else {
-        imgUrl = API_BASE.replace(/\/api$/, '') + '/' + imgUrl;
+        // For other relative images (e.g., demo images), use as-is or with frontend domain
+        imgUrl = imgUrl;
       }
     }
     return `
