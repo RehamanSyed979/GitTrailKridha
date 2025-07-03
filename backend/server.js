@@ -73,61 +73,68 @@ ensureAdminUser();
 
 // Register
 app.post('/api/register', async (req, res) => {
-  const { mobile, email, password, name } = req.body;
-  if (await User.findOne({ mobile })) return res.status(400).json({ error: 'Mobile already registered' });
-  if (await User.findOne({ email })) return res.status(400).json({ error: 'Email exists' });
-  const hash = await bcrypt.hash(password, 10);
-  const user = new User({ mobile, email, password: hash, name }); // Let Mongoose default handle createdAt
-  await user.save();
-  res.json({ success: true });
+  try {
+    const { mobile, email, password, name } = req.body;
+    if (await User.findOne({ mobile })) return res.status(400).json({ error: 'Mobile already registered' });
+    if (await User.findOne({ email })) return res.status(400).json({ error: 'Email exists' });
+    const hash = await bcrypt.hash(password, 10);
+    const user = new User({ mobile, email, password: hash, name });
+    await user.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('REGISTER ERROR:', err);
+    res.status(500).json({ error: 'Server error. Please try again.' });
+  }
 });
 
 // Login
 app.post('/api/login', async (req, res) => {
-  let { email, password } = req.body;
-  email = (email || '').trim().toLowerCase();
-  console.log('LOGIN ATTEMPT:', { email, password });
-  // Master admin login (secure)
-  if (email === 'admin@kridha.com') {
-    console.log('Master admin login attempt, received password:', password);
-    let user = await User.findOne({ email: 'admin@kridha.com' });
+  try {
+    let { email, password } = req.body;
+    email = (email || '').trim().toLowerCase();
+    console.log('LOGIN ATTEMPT:', { email });
+    // Master admin login (secure)
+    if (email === 'admin@kridha.com') {
+      console.log('Master admin login attempt');
+      let user = await User.findOne({ email: 'admin@kridha.com' });
+      if (!user) {
+        user = new User({
+          mobile: '9999999999',
+          email: 'admin@kridha.com',
+          password: await bcrypt.hash('Admin123', 10),
+          name: 'Admin',
+          role: 'admin',
+          favorites: []
+        });
+        await user.save();
+        console.log('Master admin created in DB');
+      }
+      const passOk = await bcrypt.compare(password, user.password);
+      if (!passOk) {
+        console.log('Master admin password incorrect');
+        return res.status(400).json({ error: 'Invalid credentials' });
+      }
+      console.log('Master admin login success');
+      return res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile, favorites: user.favorites || [] } });
+    }
+    // Normal user login
+    console.log('Normal user login attempt');
+    const user = await User.findOne({ email });
     if (!user) {
-      user = new User({
-        mobile: '9999999999',
-        email: 'admin@kridha.com',
-        password: await bcrypt.hash('Admin123', 10),
-        name: 'Admin',
-        role: 'admin',
-        favorites: [] // Ensure favorites array is initialized
-      });
-      await user.save();
-      console.log('Master admin created in DB');
+      console.log('User not found');
+      return res.status(400).json({ error: 'Invalid credentials' });
     }
     const passOk = await bcrypt.compare(password, user.password);
     if (!passOk) {
-      console.log('Master admin password incorrect');
+      console.log('User password incorrect');
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    // --- FIX: Do NOT reset favorites on login, always return the current favorites array ---
-    // Return full user object (including _id and favorites)
-    console.log('Master admin login success');
-    return res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile, favorites: user.favorites || [] } });
+    console.log('Normal user login success');
+    res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile } });
+  } catch (err) {
+    console.error('LOGIN ERROR:', err);
+    res.status(500).json({ error: 'Server error. Please try again.' });
   }
-  // Normal user login
-  console.log('Normal user login attempt');
-  const user = await User.findOne({ email });
-  if (!user) {
-    console.log('User not found');
-    return res.status(400).json({ error: 'Invalid credentials' });
-  }
-  const passOk = await bcrypt.compare(password, user.password);
-  if (!passOk) {
-    console.log('User password incorrect');
-    return res.status(400).json({ error: 'Invalid credentials' });
-  }
-  console.log('Normal user login success');
-  // Return full user object (including _id)
-  res.json({ success: true, user: { _id: user._id, email: user.email, name: user.name, role: user.role, mobile: user.mobile } });
 });
 
 // Get all users (admin only)
@@ -194,22 +201,43 @@ app.post('/api/ads', async (req, res) => {
 // --- Favorites API ---
 // Add/remove favorite ad for user
 app.post('/api/favorite', async (req, res) => {
-  const { userId, adId } = req.body;
-  if (!userId || !adId) return res.status(400).json({ error: 'Missing userId or adId' });
-  const user = await User.findById(userId);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  user.favorites = user.favorites || [];
-  // Ensure all favorites are stored as ObjectId (not string)
-  const adIdObj = mongoose.Types.ObjectId(adId);
-  const idx = user.favorites.findIndex(fav => fav.toString() === adIdObj.toString());
-  if (idx === -1) {
-    user.favorites.push(adIdObj);
-    await user.save();
-    return res.json({ success: true, action: 'added' });
-  } else {
-    user.favorites.splice(idx, 1);
-    await user.save();
-    return res.json({ success: true, action: 'removed' });
+  try {
+    console.log('[POST /api/favorite] Body:', req.body);
+    console.log('[POST /api/favorite] Headers:', req.headers);
+    const { userId, adId } = req.body;
+    if (!userId || !adId) {
+      console.error('Missing userId or adId');
+      return res.status(400).json({ error: 'Missing userId or adId' });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      console.error('User not found:', userId);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Check if ad exists
+    const ad = await Ad.findById(adId);
+    if (!ad) {
+      console.error('Ad not found:', adId);
+      return res.status(404).json({ error: 'Ad not found' });
+    }
+    user.favorites = user.favorites || [];
+    // Ensure all favorites are stored as ObjectId (not string)
+    const adIdObj = new mongoose.Types.ObjectId(adId);
+    const idx = user.favorites.findIndex(fav => fav.toString() === adIdObj.toString());
+    if (idx === -1) {
+      user.favorites.push(adIdObj);
+      await user.save();
+      console.log(`Added favorite: user ${userId}, ad ${adId}`);
+      return res.json({ success: true, action: 'added' });
+    } else {
+      user.favorites.splice(idx, 1);
+      await user.save();
+      console.log(`Removed favorite: user ${userId}, ad ${adId}`);
+      return res.json({ success: true, action: 'removed' });
+    }
+  } catch (err) {
+    console.error('Error in /api/favorite:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
 

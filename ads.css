@@ -1,3 +1,120 @@
+@media (max-width: 600px) {
+  .profile-avatar-upload, .profile-avatar-btns {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .profile-avatar-btns button, .profile-avatar-btns .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+}
+/* --- MOBILE-ONLY PATCH: Profile page responsiveness --- */
+@media (max-width: 600px) {
+  .profile-container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    min-width: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 1.2rem 2vw !important;
+    margin: 0 !important;
+  }
+  .profile-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .profile-avatar {
+    width: 80px !important;
+    height: 80px !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .profile-avatar-btns {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  .profile-avatar-btns button, .profile-avatar-btns .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 6px 0 !important;
+    font-size: 1rem !important;
+  }
+  .profile-form input, .profile-form select, .profile-form textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 1rem !important;
+    box-sizing: border-box !important;
+  }
+  .profile-form .form-actions {
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+    width: 100% !important;
+  }
+  .profile-form .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 8px 0 !important;
+    font-size: 1rem !important;
+  }
+  .danger-zone {
+    padding: 1rem 0.5rem !important;
+    margin-top: 1.2rem !important;
+  }
+}
+/* --- MOBILE-ONLY PATCH: Fix buttons and layout overflow on small screens --- */
+@media (max-width: 600px) {
+  body, html {
+    width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  .main-header, .nav, .nav-container, .custom-nav-right {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100vw !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .custom-nav-right > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 8px 0 !important;
+    box-sizing: border-box !important;
+  }
+  .button, .w-button, .primary-button, .secondary-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    margin: 0 0 10px 0 !important;
+    font-size: 1.05rem !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+  input, select, textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .property-grid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
 /* --- Location Input and Dropdown Button Styling --- */
 /* Location input for both modal and navbar */
 .location-input {
@@ -417,10 +534,53 @@
   color: #388e3c;
   font-weight: bold;
 }
-.ad-location {
-  font-size: 0.95rem;
-  color: #757575;
+/* .ad-location { }
+   (removed empty rule for lint) */
+
+/* --- RESPONSIVE DESIGN PATCH --- */
+@media (max-width: 900px) {
+  .property-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 18px 6px;
+  }
+  .property-card img {
+    height: 120px;
+  }
 }
+@media (max-width: 600px) {
+  .main-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 4vw;
+    gap: 8px;
+  }
+  .property-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 10px 2vw;
+  }
+  .property-card {
+    min-width: 0;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px #bcb3f7;
+  }
+  .property-card img {
+    height: 90px;
+    border-radius: 6px 6px 0 0;
+  }
+  .property-info {
+    padding: 10px 8px;
+  }
+  .ad-title, .ad-price {
+    font-size: 1rem;
+  }
+  .property-action-fab-group {
+    top: 8px !important;
+    right: 8px !important;
+  }
+}
+/* fixed lint: removed stray closing brace */
 .fav-btn {
   /* position: absolute; */
   top: 12px;

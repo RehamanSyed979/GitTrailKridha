@@ -1,6 +1,12 @@
 
-// Backend API base URL
-const API_BASE = 'http://localhost:3000/api';
+// Backend API base URL (dynamic for local/dev/prod)
+let API_BASE = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  API_BASE = 'http://localhost:3000/api';
+} else {
+  // Use same host/port as frontend, or set to your deployed backend URL
+  API_BASE = window.API_BASE_URL || `${window.location.protocol}//${window.location.hostname}:3000/api`;
+}
 
 async function registerUser(mobile, email, password, name) {
   const res = await fetch(`${API_BASE}/register`, {

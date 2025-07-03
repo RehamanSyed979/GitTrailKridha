@@ -558,7 +558,10 @@ async function toggleFavorite(adId, btn) {
   try {
     const res = await fetch(`${API_BASE}/favorite`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': currentUser.token || ''
+      },
       body: JSON.stringify({ userId: currentUser._id, adId })
     });
     if (res.ok) {
