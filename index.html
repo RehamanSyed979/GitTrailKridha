@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Fri Jun 27 2025 17:23:28 GMT+0000 (Coordinated Universal Time) -->
 <html
   data-wf-domain="kridha-realty.webflow.io"
   data-wf-page="685ecadea503f898591d3ec8"
@@ -12,6 +11,30 @@
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="Webflow" name="generator" />
     <link href="styles1.css" rel="stylesheet" type="text/css" />
+    <!-- jQuery must load before any script that uses $ -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // Set API base URL for all frontend scripts
+      window.API_BASE_URL = "https://gittrailkridhabackend.onrender.com";
+    </script>
+    <script src="auth.js"></script>
+    <script src="auth-ui.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script>
+      // Your Firebase config
+      const firebaseConfig = {
+        apiKey: "AIzaSyBRtLIXMyDaOqrjfhs_9xxQRKKvcHVk9QU",
+        authDomain: "kridharealty-auth.firebaseapp.com",
+        projectId: "kridharealty-auth",
+        storageBucket: "kridharealty-auth.firebasestorage.app",
+        messagingSenderId: "586121351442",
+        appId: "1:586121351442:web:c9c2575576245f74b9e3cb",
+        measurementId: "G-7FRSZ6VNKC"
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link
       href="https://fonts.gstatic.com"
@@ -45,6 +68,92 @@
     />
   </head>
   <body>
+    <script>
+      // Redirect logged-in users to home.html
+      try {
+        var u = localStorage.getItem('kridha_current_user');
+        if (u) {
+          var userObj = JSON.parse(u);
+          if (userObj && userObj._id) {
+            window.location.replace('home.html');
+          }
+        }
+      } catch(e) {}
+    </script>
+    <!-- Signup Success Modal -->
+    <div id="signup-success-modal" class="modal" style="display:none;">
+      <div class="signup-success-content">
+        <div class="checkmark-animation">
+          <svg viewBox="0 0 52 52" class="checkmark-svg">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14 27l7 7 16-16"/>
+          </svg>
+        </div>
+        <h3>Registration successful!</h3>
+        <p>Please sign in.</p>
+        <button id="signup-success-ok" type="button">OK</button>
+      </div>
+    </div>
+    <!-- Sign In Modal -->
+    <div id="signin-modal" class="modal">
+      <div class="card-link card-link-on-inverse">
+        <h2 class="h3-heading">Sign In</h2>
+        <div style="display:flex;gap:1rem;margin-bottom:1.2rem;">
+          <button id="signin-tab-email" class="button primary-button" type="button">Email/Password</button>
+          <button id="signin-tab-otp" class="button secondary-button" type="button">Mobile OTP</button>
+        </div>
+        <form id="signin-form-email" class="w-form">
+          <label for="signin-email">Email</label>
+          <input class="input w-input" id="signin-email" type="email" required placeholder="Email" />
+          <label for="signin-password">Password</label>
+          <input class="input w-input" id="signin-password" type="password" required placeholder="Password" />
+          <button class="button primary-button" type="submit">Sign In</button>
+          <button class="button secondary-button" type="button" id="close-signin-modal" style="margin-left:1rem">Cancel</button>
+        </form>
+        <form id="signin-form-otp" class="w-form" style="display:none;">
+          <label for="signin-mobile">Mobile Number</label>
+          <input class="input w-input" id="signin-mobile" type="tel" required pattern="[0-9]{10}" placeholder="Enter mobile number" />
+          <button class="button primary-button" type="button" id="signin-send-otp-btn">Send OTP</button>
+          <div id="signin-recaptcha-container" style="margin-top:1rem;"></div>
+          <div id="signin-otp-section" style="display:none; margin-top:1rem;">
+            <label for="signin-otp">Enter OTP</label>
+            <input class="input w-input" id="signin-otp" type="text" required placeholder="Enter OTP" />
+            <button class="button primary-button" type="button" id="signin-verify-otp-btn">Verify OTP & Sign In</button>
+          </div>
+          <button class="button secondary-button" type="button" id="close-signin-modal-otp" style="margin-left:1rem;margin-top:1rem;">Cancel</button>
+        </form>
+        <div id="signin-error" class="utility-text-secondary" style="color:red;display:none;margin-top:1rem"></div>
+      </div>
+    </div>
+    <!-- Sign Up Modal -->
+    <div id="signup-modal" class="modal">
+      <div class="card-link card-link-on-inverse">
+        <h2 class="h3-heading">Sign Up</h2>
+        <form id="signup-mobile-form" class="w-form">
+          <label for="signup-mobile">Mobile Number</label>
+          <input class="input w-input" id="signup-mobile" type="tel" required pattern="[0-9]{10}" placeholder="Enter mobile number" />
+          <button class="button primary-button" type="button" id="send-otp-btn">Send OTP</button>
+          <div id="recaptcha-container" style="margin-top:1rem;"></div>
+          <div id="otp-section" style="display:none; margin-top:1rem;">
+            <label for="signup-otp">Enter OTP</label>
+            <input class="input w-input" id="signup-otp" type="text" required placeholder="Enter OTP" />
+            <button class="button primary-button" type="button" id="verify-otp-btn">Verify OTP</button>
+          </div>
+        </form>
+        <form id="signup-form" class="w-form" style="display:none;">
+          <label for="signup-name">Name</label>
+          <input class="input w-input" id="signup-name" type="text" required placeholder="Full Name" />
+          <label for="signup-email">Email</label>
+          <input class="input w-input" id="signup-email" type="email" required placeholder="Email" />
+          <label for="signup-password">Password</label>
+          <input class="input w-input" id="signup-password" type="password" required placeholder="Password" />
+          <button class="button primary-button" type="submit">Sign Up</button>
+          <button class="button secondary-button" type="button" id="close-signup-modal" style="margin-left:1rem">Cancel</button>
+        </form>
+        <div id="signup-error" class="utility-text-secondary" style="color:red;display:none;margin-top:1rem"></div>
+      </div>
+    </div>
+    <!-- Admin Panel is now a separate page: admin.html -->
     <div class="nav secondary-nav">
       <div
         data-duration="400"
@@ -57,6 +166,7 @@
         class="nav-container w-nav"
       >
         <div class="nav-left">
+          <!-- Auth buttons moved to nav-right -->
           <a href="#" class="nav-logo w-inline-block"
             ><div class="nav-logo-icon">
               <svg
@@ -349,8 +459,8 @@
                                       </svg>
                                     </div>
                                     <div
-                                      id="w-node-_454d89d0-877e-ab01-352f-70c94d562dca-4d562d54"
-                                      class="w-node-a41386b8-6bf1-1237-3b4d-8b516b80ed06-6b80ec92"
+                                      id="w-node-_454d89d0-877e-ab01-352f-70c94d562dd5-4d562d54"
+                                      class="w-node-a41386b8-6bf1-1237-3b4d-8b516b80ed11-6b80ec92"
                                     >
                                       <div><strong>Management</strong></div>
                                       <div
@@ -380,8 +490,8 @@
                                       </svg>
                                     </div>
                                     <div
-                                      id="w-node-_454d89d0-877e-ab01-352f-70c94d562dd5-4d562d54"
-                                      class="w-node-a41386b8-6bf1-1237-3b4d-8b516b80ed11-6b80ec92"
+                                      id="w-node-_454d89d0-877e-ab01-352f-70c94d562dbf-4d562d54"
+                                      class="w-node-a41386b8-6bf1-1237-3b4d-8b516b80ed06-6b80ec92"
                                     >
                                       <div><strong>Home Loans</strong></div>
                                       <div
@@ -486,11 +596,27 @@
             </ul>
           </nav>
         </div>
-        <div class="nav-right">
-          <div class="button-group utility-margin-top-0">
-            <a href="#" class="button w-inline-block"
-              ><div class="button-label">Search</div></a
-            >
+        <div class="nav-right custom-nav-right">
+          <!-- Location search removed for fresh implementation -->
+          <input type="text" id="nav-search-bar" class="nav-search-bar" placeholder="Search properties..." style="margin-right: 1rem; display: inline-block;" />
+          <button class="button primary-button" id="open-signin-modal" type="button" tabindex="0">Sign In</button>
+          <button class="button secondary-button" id="open-signup-modal" type="button" tabindex="0">Sign Up</button>
+          <div class="profile-dropdown-wrapper" style="position:relative;display:inline-block;">
+            <button id="profile-icon-btn" class="profile-icon-btn" title="Profile" style="display: inline-flex; align-items: center; justify-content: center;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="16" fill="#ece8ff"/>
+                <circle cx="16" cy="13" r="5" fill="#6a5acd"/>
+                <ellipse cx="16" cy="23" rx="7" ry="4" fill="#bcb3f7"/>
+              </svg>
+            </button>
+            <div id="profile-dropdown" class="profile-dropdown-menu" style="display:none;right:0;">
+              <ul>
+                <li><button id="view-profile-btn" type="button">View Profile</button></li>
+                <li><button id="profile-settings-btn" type="button">Settings</button></li>
+                <li><a href="admin.html" id="open-admin-modal" style="display:none"><button type="button">Admin Panel</button></a></li>
+                <li><button id="profile-logout-btn" type="button" style="color:#c00;font-weight:600;">Logout</button></li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="nav-mobile-menu-button w-nav-button">
@@ -527,6 +653,7 @@
     </div>
     <header class="section secondary-section">
       <div class="container">
+        <span id="user-greeting" style="display:none;font-size:1.1rem;font-weight:500;margin-bottom:0.5rem;"></span>
         <div class="w-layout-grid grid-layout tablet-1-column grid-gap-xxl">
           <div
             id="w-node-_1a4e2b76-4ff4-9917-3a06-ea31ddf44bd1-ddf44bce"
@@ -1132,7 +1259,7 @@
                 ></path>
               </svg>
             </div>
-            <h4 class="h5-heading">Phone support</h4>
+            <h3 class="h5-heading">Phone support</h3>
             <p class="utility-text-secondary">
               Mon&ndash;Fri, 8am&ndash;5pm IST
             </p>
@@ -1162,7 +1289,7 @@
                 ></circle>
               </svg>
             </div>
-            <h4 class="h5-heading">Office visit</h4>
+            <h3 class="h5-heading">Office visit</h3>
             <p class="utility-text-secondary">
               Schedule a meeting with our team.
             </p>
@@ -1485,14 +1612,10 @@
         </div>
       </div>
     </footer>
-    <script
-      src="script2.js"
-      type="text/javascript"
-      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-      crossorigin="anonymous"
-    ></script>
+    <script src="script2.js" type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="script3.js" type="text/javascript"></script>
     <script src="script4.js" type="text/javascript"></script>
     <script src="script5.js" type="text/javascript"></script>
-  </body>
+    <!-- Location search and Google Maps scripts removed for fresh implementation -->
+</body>
 </html>

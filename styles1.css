@@ -1,3 +1,359 @@
+/* --- Google Places Autocomplete Dropdown Fix --- */
+.pac-container {
+  z-index: 99999 !important;
+  position: absolute !important;
+  box-shadow: 0 4px 24px #0003 !important;
+  border-radius: 14px !important;
+  font-size: 1.08rem !important;
+}
+
+/* Prevent parent containers from clipping the dropdown */
+/* Location input styles removed */
+/* --- PROFILE DROPDOWN MENU --- */
+.profile-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* --- Custom Nav Bar Buttons: Larger, Modern, and More Prominent --- */
+.button.w-button,
+.secondary-button.w-button,
+.primary-button.w-button {
+  min-width: 140px;
+  padding: 1.1rem 2.7rem;
+  font-size: 1.28rem;
+  border-radius: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 8px #e3eaf6;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+/* Further increase for main nav buttons (Favorites, Chat, Profile, Sell) */
+.favorites-btn, .chat-btn, .profile-btn, .sell-btn {
+  min-width: 148px !important;
+  min-height: 60px !important;
+  font-size: 1.32rem !important;
+  padding: 1.18rem 2.9rem !important;
+  border-radius: 1.2rem !important;
+  font-weight: 800 !important;
+}
+.secondary-button.w-button {
+  background: #e3e6ee;
+  color: #222;
+  border: none;
+}
+.secondary-button.w-button:hover {
+  background: #d1d5db;
+  color: #3c0087;
+}
+.primary-button.w-button {
+  background: #3c0087;
+  color: #fff;
+  border: none;
+}
+.primary-button.w-button:hover {
+  background: #23004c;
+  color: #fff;
+}
+@media (max-width: 700px) {
+  .button.w-button,
+  .secondary-button.w-button,
+  .primary-button.w-button {
+    min-width: 90px;
+    font-size: 1rem;
+    padding: 0.6rem 1.1rem;
+  }
+}
+.profile-dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  min-width: 160px;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 24px rgba(44,36,87,0.13);
+  z-index: 3000;
+  padding: 0.5rem 0;
+  display: none;
+}
+.profile-dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.profile-dropdown-menu li {
+  margin: 0;
+  padding: 0;
+}
+.profile-dropdown-menu button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #2c2457;
+  text-align: left;
+  padding: 0.75em 1.2em;
+  font-size: 1rem;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.profile-dropdown-menu button:hover, .profile-dropdown-menu button:focus {
+  background: #ece8ff;
+  color: #6a5acd;
+}
+.profile-dropdown-menu li:last-child button {
+  color: #c00;
+  font-weight: 600;
+}
+/* --- END PROFILE DROPDOWN MENU --- */
+/* --- CUSTOM NAV BAR LAYOUT --- */
+.custom-nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* #nav-search-bar styles remain, location input styles removed */
+#nav-search-bar {
+  padding: 0.5em 1em;
+  border: 1.5px solid #bcb3f7;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  min-width: 180px;
+  background: #fff;
+  color: #2c2457;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+/* #nav-search-bar:focus styles remain, location input styles removed */
+#nav-search-bar:focus {
+  border-color: #6a5acd;
+  box-shadow: 0 0 0 2px #bcb3f7;
+}
+
+.profile-icon-btn {
+  background: none;
+  border: none;
+  padding: 0.2em;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border 0.2s;
+  outline: none;
+}
+.profile-icon-btn:focus, .profile-icon-btn:hover {
+  box-shadow: 0 0 0 3px #bcb3f7;
+  border: 1.5px solid #6a5acd;
+}
+
+#logout-btn {
+  margin-right: 0 !important;
+}
+/* --- END CUSTOM NAV BAR LAYOUT --- */
+/* --- SIGNUP SUCCESS MODAL --- */
+#signup-success-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44,36,87,0.85);
+  backdrop-filter: blur(2px);
+  justify-content: center;
+  align-items: center;
+  transition: none;
+}
+#signup-success-modal.active {
+  display: flex;
+}
+#signup-success-modal .signup-success-content {
+  background: #fff;
+  color: #2c2457;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(44,36,87,0.18);
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  min-width: 340px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+.checkmark-animation {
+  margin-bottom: 1rem;
+}
+.checkmark-svg {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+.checkmark-circle {
+  stroke: #bcb3f7;
+  stroke-width: 3;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: checkmark-circle 0.6s ease-out forwards;
+}
+.checkmark-check {
+  stroke: #6a5acd;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: checkmark-check 0.4s 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+@keyframes checkmark-circle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes checkmark-check {
+  to { stroke-dashoffset: 0; }
+}
+#signup-success-modal button {
+  border: 1.5px solid #6a5acd;
+  border-radius: 0.5rem;
+  padding: 0.5em 1.5em;
+  background: #fff;
+  color: #2c2457;
+  font-weight: 500;
+  margin-top: 0.5em;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+#signup-success-modal button:hover,
+#signup-success-modal button:focus {
+  border-color: #6a5acd;
+  background: #ece8ff;
+  color: #2c2457;
+  box-shadow: 0 0 0 3px #bcb3f7;
+}
+/* Modal overlay styles */
+
+/* Modal content styles */
+
+/* --- MODAL STYLES (deduplicated and improved) --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44,36,87,0.85);
+  backdrop-filter: blur(2px);
+  justify-content: center;
+  align-items: center;
+  transition: none !important;
+}
+
+/* Prevent overlay from changing opacity on hover of modal content */
+.modal:hover,
+.modal:focus,
+.modal:active {
+  background: rgba(44,36,87,0.85) !important;
+}
+
+/* Keep modal content background always white, even on hover/focus/active and prevent overlay from changing on any child hover */
+/* Force modal content to always be solid white, never transparent, on any state or descendant */
+/* Remove forced white background and box-shadow from all descendants to avoid white box grid effect */
+.modal .card-link.card-link-on-inverse {
+  background: #fff !important;
+  opacity: 1 !important;
+  box-shadow: 0 8px 32px rgba(44,36,87,0.18) !important;
+  transition: none !important;
+}
+.modal .card-link.card-link-on-inverse *,
+.modal .card-link.card-link-on-inverse *:hover,
+.modal .card-link.card-link-on-inverse *:focus,
+.modal .card-link.card-link-on-inverse *:active {
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+/* Prevent any parent or global fading/opacity on modal content */
+.modal .card-link.card-link-on-inverse,
+.modal .card-link.card-link-on-inverse * {
+  opacity: 1 !important;
+  background: #fff !important;
+  transition: none !important;
+}
+
+.modal {
+  pointer-events: auto;
+}
+
+.modal .card-link.card-link-on-inverse {
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  min-width: 480px;
+  max-width: 520px;
+  width: 100%;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 8px 32px rgba(44,36,87,0.18);
+  border-radius: 2rem;
+  font-size: 1.15rem;
+  transition: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.modal .card-link.card-link-on-inverse label,
+.modal .card-link.card-link-on-inverse h2,
+.modal .card-link.card-link-on-inverse input,
+.modal .card-link.card-link-on-inverse button {
+  color: #222 !important;
+  background: none;
+}
+
+/* Add spacing between input fields and buttons */
+.modal .card-link.card-link-on-inverse input {
+  margin-bottom: 1rem;
+}
+.modal .card-link.card-link-on-inverse .auth-buttons {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+/* Add thin outline and hover/focus effect to sign-in and cancel buttons */
+.modal .card-link.card-link-on-inverse button {
+  border: 1.5px solid #6a5acd;
+  border-radius: 0.5rem;
+  padding: 0.5em 1.5em;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  margin: 0 0.5em;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Highlight sign in, sign up, and cancel buttons on hover/focus with theme colors */
+
+/* Fix: Ensure highlight on hover/focus for modal buttons using !important and increased specificity */
+.modal .card-link.card-link-on-inverse button:hover,
+.modal .card-link.card-link-on-inverse button:focus {
+  border-color: #6a5acd !important;
+  background: #ece8ff !important;
+  color: #2c2457 !important;
+  box-shadow: 0 0 0 3px #bcb3f7 !important;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s !important;
+}
+
+.modal .card-link.card-link-on-inverse input::placeholder {
+  color: #bbb !important;
+}
+/* --- END MODAL STYLES --- */
 html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
@@ -290,90 +646,9 @@ pre.w-code-block code {
   all: inherit;
 }
 
+
 .w-optimization {
   display: contents;
-}
-
-.w-webflow-badge, .w-webflow-badge > img {
-  box-sizing: unset;
-  width: unset;
-  height: unset;
-  max-height: unset;
-  max-width: unset;
-  min-height: unset;
-  min-width: unset;
-  margin: unset;
-  padding: unset;
-  float: unset;
-  clear: unset;
-  border: unset;
-  border-radius: unset;
-  background: unset;
-  background-image: unset;
-  background-position: unset;
-  background-size: unset;
-  background-repeat: unset;
-  background-origin: unset;
-  background-clip: unset;
-  background-attachment: unset;
-  background-color: unset;
-  box-shadow: unset;
-  transform: unset;
-  direction: unset;
-  font-family: unset;
-  font-weight: unset;
-  color: unset;
-  font-size: unset;
-  line-height: unset;
-  font-style: unset;
-  font-variant: unset;
-  text-align: unset;
-  letter-spacing: unset;
-  -webkit-text-decoration: unset;
-  text-decoration: unset;
-  text-indent: unset;
-  text-transform: unset;
-  list-style-type: unset;
-  text-shadow: unset;
-  vertical-align: unset;
-  cursor: unset;
-  white-space: unset;
-  word-break: unset;
-  word-spacing: unset;
-  word-wrap: unset;
-  transition: unset;
-}
-
-.w-webflow-badge {
-  white-space: nowrap;
-  cursor: pointer;
-  box-shadow: 0 0 0 1px #0000001a, 0 1px 3px #0000001a;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 2147483647 !important;
-  color: #aaadb0 !important;
-  overflow: unset !important;
-  background-color: #fff !important;
-  border-radius: 3px !important;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 6px !important;
-  font-size: 12px !important;
-  line-height: 14px !important;
-  text-decoration: none !important;
-  display: inline-block !important;
-  position: fixed !important;
-  inset: auto 12px 12px auto !important;
-  transform: none !important;
-}
-
-.w-webflow-badge > img {
-  position: unset;
-  visibility: unset !important;
-  opacity: 1 !important;
-  vertical-align: middle !important;
-  display: inline-block !important;
 }
 
 h1, h2, h3, h4, h5, h6 {

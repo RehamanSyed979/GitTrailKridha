@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property Marketplace</title>
+  <link rel="stylesheet" href="styles1.css">
+  <link rel="stylesheet" href="ads.css">
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "https://gittrailkridhabackend.onrender.com";
+  </script>
+  <script src="auth-ui.js" defer></script>
+  <!-- Google Maps JS API for Places Autocomplete -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7F3clU1iuAWHdhGgZiOsd5zDY0PcUu4Q&libraries=places"></script>
+  <script src="ads.js" defer></script>
+  <script>
+    // Sync currentUser from localStorage (set by auth-ui.js) to ads.js
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const u = localStorage.getItem('kridha_current_user');
+        if (u) window.currentUser = JSON.parse(u);
+      } catch(e) { window.currentUser = null; }
+    });
+  </script>
+</head>
+  <body style="background:#e3eaf6;min-height:100vh;font-family:'Manrope', 'DM Sans', Arial, sans-serif;">
+  <div class="nav secondary-nav" style="background:transparent;box-shadow:none;">
+    <div class="nav-container w-nav" style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 0 1.2rem 0;">
+      <div class="nav-left" style="display:flex;align-items:center;gap:0.7rem;">
+        <div class="nav-logo-icon" style="width:38px;height:38px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #bcb3f7;">
+          <svg width="28" height="28" viewBox="0 0 33 33" fill="none"><path d="M28,0H5C2.24,0,0,2.24,0,5v23c0,2.76,2.24,5,5,5h23c2.76,0,5-2.24,5-5V5c0-2.76-2.24-5-5-5ZM29,17c-6.63,0-12,5.37-12,12h-1c0-6.63-5.37-12-12-12v-1c6.63,0,12-5.37,12-12h1c0,6.63,5.37,12,12,12v1Z" fill="#3c0087"/></svg>
+        </div>
+        <div class="paragraph-lg utility-margin-bottom-0" style="font-size:1.35rem;font-weight:700;color:#3c0087;letter-spacing:0.5px;">Kridha Realty</div>
+      </div>
+      <div class="custom-nav-right" style="gap:1.1rem;display:flex;align-items:center;">
+        <input type="text" id="search" class="nav-search-bar" placeholder="Search properties..." style="min-width:180px;max-width:220px;width:19vw;padding:0.6rem 1.1rem;border-radius:2rem;border:1.5px solid #d1d5db;background:#fff;box-shadow:0 2px 8px #e3eaf6;font-size:1rem;outline:none;transition:border-color 0.2s;">
+        <div style="position:relative;min-width:220px;max-width:260px;width:19vw;">
+          <input type="text" id="navLocationInput" class="location-input" placeholder="Enter city, area, or landmark..." autocomplete="off" style="width:100%;">
+          <div id="navLocationSuggestions"></div>
+        </div>
+        <button id="favoritesBtn" class="button secondary-button w-button" style="min-width:90px;padding:0.55rem 1.1rem;font-size:1rem;">&#10084; Favorites</button>
+        <button id="chatBtn" class="button secondary-button w-button" style="min-width:70px;padding:0.55rem 1.1rem;font-size:1rem;">💬 Chat</button>
+        <button id="profileBtn" class="button secondary-button w-button" style="min-width:80px;padding:0.55rem 1.1rem;font-size:1rem;">👤 Profile</button>
+        <button id="sellBtn" class="button primary-button w-button" style="min-width:80px;padding:0.55rem 1.3rem;font-size:1.05rem;margin-right:0;">+ Sell</button>
+      </div>
+    </div>
+  </div>
+    <main style="max-width:1200px;margin:2.5rem auto 0 auto;">
+      <div id="propertyGrid" class="property-grid"></div>
+    </main>
+  <!-- Modal for posting ad -->
+  <div id="sellModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" id="closeSellModal">&times;</span>
+      <h2>Post Your Property Ad</h2>
+      <form id="sellForm">
+
+        <!-- INCLUDE SOME DETAILS -->
+        <div style="font-weight:600;color:#1a237e;font-size:1.13rem;margin-bottom:8px;">INCLUDE SOME DETAILS</div>
+        <label for="type" class="form-label">Type*</label>
+        <select id="type" name="type" required style="padding:12px 14px;border:1.5px solid #bdbdbd;border-radius:7px;font-size:1.09rem;background:#fafaff;outline:none;box-sizing:border-box;margin-bottom:10px;">
+          <option value="" disabled selected hidden>Select type</option>
+          <option value="Flats / Apartments">Flats / Apartments</option>
+          <option value="Independent / Builder Floors">Independendent / Builder Floors</option>
+          <option value="Farm House">Farm House</option>
+          <option value="House & Villa">House & Villa</option>
+          <option value="Open Plots">Open Plots</option>
+          <option value="Commercial">Commercial</option>
+          <option value="Office Spaces">Office Spaces</option>
+        </select>
+
+        <div id="BHK-group" style="display:flex;gap:48px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-start;">
+          <div>
+            <label id="BHK-label" class="form-section-label" style="font-weight:700; color:#23236a; font-size:1.13rem; margin-bottom:7px; margin-top:18px; letter-spacing:0.01em; display:block;">BHK</label>
+            <div class="horizontal-radio-group">
+              <label><input type="radio" name="bhk" value="1"> 1</label>
+              <label><input type="radio" name="bhk" value="2"> 2</label>
+              <label><input type="radio" name="bhk" value="3"> 3</label>
+              <label><input type="radio" name="bhk" value="4"> 4+</label>
+            </div>
+          </div>
+          <div>
+            <label id="Bathrooms-label" class="form-section-label" style="font-weight:700; color:#23236a; font-size:1.13rem; margin-bottom:7px; margin-top:18px; letter-spacing:0.01em; display:block;">Bathrooms</label>
+            <div class="horizontal-radio-group">
+              <label><input type="radio" name="bathrooms" value="1"> 1</label>
+              <label><input type="radio" name="bathrooms" value="2"> 2</label>
+              <label><input type="radio" name="bathrooms" value="3"> 3</label>
+              <label><input type="radio" name="bathrooms" value="4"> 4+</label>
+            </div>
+          </div>
+        </div>
+
+        <div id="Furnishing-group" style="display:flex;gap:48px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-start;">
+          <div>
+            <label id="Furnishing-label" class="form-section-label" style="font-weight:700; color:#23236a; font-size:1.13rem; margin-bottom:7px; margin-top:18px; letter-spacing:0.01em; display:block;">Furnishing</label>
+            <div class="horizontal-radio-group">
+              <label><input type="radio" name="furnishing" value="Furnished"> Furnished</label>
+              <label><input type="radio" name="furnishing" value="Semi-Furnished"> Semi-Furnished</label>
+              <label><input type="radio" name="furnishing" value="Unfurnished"> Unfurnished</label>
+            </div>
+          </div>
+          <div>
+            <label id="ProjectStatus-label" class="form-section-label" style="font-weight:700; color:#23236a; font-size:1.13rem; margin-bottom:7px; margin-top:18px; letter-spacing:0.01em; display:block;">Project Status</label>
+            <div class="horizontal-radio-group">
+              <label><input type="radio" name="projectStatus" value="New Launch"> New Launch</label>
+              <label><input type="radio" name="projectStatus" value="Ready to Move"> Ready to Move</label>
+              <label><input type="radio" name="projectStatus" value="Under Construction"> Under Construction</label>
+            </div>
+          </div>
+        </div>
+
+        <div id="Lister-group" style="display:flex;gap:48px;margin-bottom:10px;flex-wrap:wrap;align-items:flex-start;">
+          <div>
+            <label id="Lister-label" class="form-section-label" style="font-weight:700; color:#23236a; font-size:1.13rem; margin-bottom:7px; margin-top:18px; letter-spacing:0.01em; display:block;">Lister</label>
+            <div class="horizontal-radio-group">
+              <label><input type="radio" name="lister" value="Builder"> Builder</label>
+              <label><input type="radio" name="lister" value="Dealer"> Dealer</label>
+              <label><input type="radio" name="lister" value="Owner"> Owner</label>
+            </div>
+          </div>
+        </div>
+
+        <label id="superBuiltup-label" for="superBuiltup" class="form-label">Super Builtup area sqft *</label>
+        <input type="number" id="superBuiltup" name="superBuiltup" placeholder="Super Builtup area" required>
+
+        <label id="carpetArea-label" for="carpetArea" class="form-label">Carpet Area sqft *</label>
+        <input type="number" id="carpetArea" name="carpetArea" placeholder="Carpet Area" required>
+
+        <label id="maintenance-label" for="maintenance" class="form-label">Maintenance (Monthly)</label>
+        <input type="number" id="maintenance" name="maintenance" placeholder="Maintenance (Monthly)">
+
+        <label id="totalFloors-label" for="totalFloors" class="form-label">Total Floors</label>
+        <input type="number" id="totalFloors" name="totalFloors" placeholder="Total Floors">
+
+        <label id="floorNo-label" for="floorNo" class="form-label">Floor No</label>
+        <input type="number" id="floorNo" name="floorNo" placeholder="Floor No">
+
+        <label id="carParking-label" for="carParking" class="form-label">Car Parking</label>
+        <div id="carParking-group" class="horizontal-radio-group" style="margin-bottom:10px;">
+          <label><input type="radio" name="carParking" value="0"> 0</label>
+          <label><input type="radio" name="carParking" value="1"> 1</label>
+          <label><input type="radio" name="carParking" value="2"> 2</label>
+          <label><input type="radio" name="carParking" value="3"> 3</label>
+          <label><input type="radio" name="carParking" value="3+"> 3+</label>
+        </div>
+
+        <label id="facing-label" for="facing" class="form-label">Facing</label>
+        <select id="facing" name="facing">
+          <option value="">Select Facing</option>
+          <option value="East">East</option>
+          <option value="West">West</option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+          <option value="North-East">North-East</option>
+          <option value="North-West">North-West</option>
+          <option value="South-East">South-East</option>
+          <option value="South-West">South-West</option>
+        </select>
+
+        <label id="projectName-label" for="projectName" class="form-label">Project Name</label>
+        <input type="text" id="projectName" name="projectName" maxlength="70" placeholder="Project Name">
+
+        <label for="title" class="form-label">Ad Title *</label>
+        <input type="text" id="title" name="title" maxlength="70" placeholder="Mention the key features of your listing (e.g. brand, model, size, type)" required>
+
+        <label for="description" class="form-label">Description *</label>
+        <textarea id="description" name="description" maxlength="4000" placeholder="Include condition, features and reason for selling" required></textarea>
+
+        <!-- SET A PRICE -->
+        <div style="font-weight:600;color:#1a237e;font-size:1.13rem;margin:18px 0 8px 0;">SET A PRICE</div>
+        <label for="price" class="form-label">Price *</label>
+        <input type="number" id="price" name="price" placeholder="Enter price" required>
+
+        <!-- UPLOAD UP TO 20 PHOTOS -->
+        <div style="font-weight:600;color:#1a237e;font-size:1.13rem;margin:18px 0 8px 0;">UPLOAD UP TO 20 PHOTOS</div>
+        <label for="images" class="form-label" style="font-weight:500;">Upload Images</label>
+        <input type="file" id="images" name="images" multiple accept="image/*" required>
+        <div id="imagePreview" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px 0;"></div>
+
+        <!-- CONFIRM YOUR LOCATION -->
+        <div style="font-weight:600;color:#1a237e;font-size:1.13rem;margin:18px 0 8px 0;">CONFIRM YOUR LOCATION</div>
+        <label for="state" class="form-label">State *</label>
+        <select id="state" name="state" required>
+          <option value="">Select State</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Karnataka">Karnataka</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Delhi">Delhi</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="locationInput" class="form-label">Location</label>
+        <div style="position:relative;min-width:180px;max-width:240px;width:100%;margin-bottom:16px;">
+          <input type="text" id="locationInput" name="location" placeholder="Search location..." autocomplete="off" style="width:100%;padding:10px 12px;border:1.5px solid #bdbdbd;border-radius:6px;font-size:1.08rem;background:#fafaff;transition:border 0.2s,box-shadow 0.2s;outline:none;box-sizing:border-box;">
+          <div id="locationSuggestions" style="position:absolute;left:0;right:0;top:100%;z-index:2000;background:#fff;border-radius:10px;box-shadow:0 4px 18px #0002;display:none;"></div>
+        </div>
+
+        <label for="landmark" class="form-label">Landmark</label>
+        <input type="text" id="landmark" name="landmark" placeholder="Enter nearby landmark (optional)">
+
+        <!-- REVIEW YOUR DETAILS -->
+        <div style="font-weight:600;color:#1a237e;font-size:1.13rem;margin:18px 0 8px 0;">REVIEW YOUR DETAILS</div>
+        <label for="name" class="form-label">Name</label>
+        <input type="text" id="name" name="name" maxlength="25" placeholder="Your Name">
+
+        <label for="mobile" class="form-label">Mobile Phone Number *</label>
+        <input type="tel" id="mobile" name="mobile" maxlength="15" placeholder="+91">
+
+        <button type="submit" class="primary">Post Ad</button>
+      </form>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
