@@ -1,0 +1,651 @@
+@media (max-width: 600px) {
+  .profile-avatar-upload, .profile-avatar-btns {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .profile-avatar-btns button, .profile-avatar-btns .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+}
+/* --- MOBILE-ONLY PATCH: Profile page responsiveness --- */
+@media (max-width: 600px) {
+  .profile-container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    min-width: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 1.2rem 2vw !important;
+    margin: 0 !important;
+  }
+  .profile-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 1.2rem !important;
+  }
+  .profile-avatar {
+    width: 80px !important;
+    height: 80px !important;
+    margin-bottom: 0.7rem !important;
+  }
+  .profile-avatar-btns {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    align-items: stretch !important;
+  }
+  .profile-avatar-btns button, .profile-avatar-btns .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 6px 0 !important;
+    font-size: 1rem !important;
+  }
+  .profile-form input, .profile-form select, .profile-form textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 1rem !important;
+    box-sizing: border-box !important;
+  }
+  .profile-form .form-actions {
+    flex-direction: column !important;
+    gap: 0.7rem !important;
+    width: 100% !important;
+  }
+  .profile-form .button {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 8px 0 !important;
+    font-size: 1rem !important;
+  }
+  .danger-zone {
+    padding: 1rem 0.5rem !important;
+    margin-top: 1.2rem !important;
+  }
+}
+/* --- MOBILE-ONLY PATCH: Fix buttons and layout overflow on small screens --- */
+@media (max-width: 600px) {
+  body, html {
+    width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  .main-header, .nav, .nav-container, .custom-nav-right {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100vw !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .custom-nav-right > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 8px 0 !important;
+    box-sizing: border-box !important;
+  }
+  .button, .w-button, .primary-button, .secondary-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    margin: 0 0 10px 0 !important;
+    font-size: 1.05rem !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+  input, select, textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .property-grid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+/* --- Location Input and Dropdown Button Styling --- */
+/* Location input for both modal and navbar */
+.location-input {
+  width: 100%;
+  padding: 0.65rem 1.1rem 0.65rem 1.1rem;
+  border-radius: 2rem;
+  border: 2px solid #512da8;
+  background: #fff;
+  box-shadow: 0 2px 8px #e3eaf6;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.location-input:focus {
+  border-color: #3c0087;
+  box-shadow: 0 0 0 2px #ede7f6;
+}
+.location-dropdown-btn {
+  position: absolute;
+  right: -38px; /* move arrow outside input, adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #512da8;
+  z-index: 2;
+  padding: 0;
+  height: 2.2em;
+  width: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+/* Ensure the parent container is wide enough and has position:relative */
+.custom-nav-right > div[style*="position:relative"] {
+  min-width: 260px !important;
+  position: relative !important;
+  display: flex;
+  align-items: center;
+}
+/* --- Location Autocomplete Dropdown Styling (Fixed Position) --- */
+#locationSuggestions,
+#navLocationSuggestions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  width: 100%;
+  min-width: 220px;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px #0002;
+  z-index: 2000;
+  display: none;
+  padding: 0.3em 0;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1rem;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.7em 1.1em;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 1rem;
+  border: none;
+  background: none;
+}
+.suggestion-item:not(.use-current):hover,
+.suggestion-item.active {
+  background: #ede7f6;
+}
+.suggestion-item.use-current {
+  font-weight: 600;
+  color: #3c0087;
+  border-bottom: 1px solid #eee;
+  background: #f7f5ff;
+}
+.suggestion-item.recent span:first-child,
+.suggestion-item.area span:first-child {
+  color: #888;
+}
+.suggestion-item span {
+  pointer-events: none;
+}
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+/* Section headers in dropdown */
+#locationSuggestions > div[style*="color:#888"] {
+  font-size: 0.93em;
+  color: #888;
+  padding: 0.5em 1.1em 0.2em 1.1em;
+  font-weight: 500;
+  background: #fafaff;
+}
+#locationSuggestions hr {
+  margin: 0.2em 0 0.2em 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+/* Ensure input and button are above dropdown */
+#locationInput, #locationDropdownBtn {
+  position: relative;
+  z-index: 2100;
+}
+/* --- Sell Modal Form Field Styling --- */
+#sellModal .modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Horizontal radio groups for property details */
+.horizontal-radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.horizontal-radio-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1a237e;
+  margin-right: 18px;
+  margin-bottom: 0;
+  font-size: 1.08rem;
+  line-height: 1.2;
+  cursor: pointer;
+  position: relative;
+  min-width: 0;
+  vertical-align: middle;
+}
+.horizontal-radio-group input[type="radio"] {
+  margin: 0 4px 0 0;
+  accent-color: #512da8;
+  vertical-align: middle;
+  position: relative;
+  top: 0.5px;
+  width: 18px;
+  height: 18px;
+}
+/* Style select (dropdown) fields in the modal to match inputs */
+#sellModal .modal-content select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 7px;
+  font-size: 1.09rem;
+  background: #fafaff;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+#sellModal .modal-content select:focus {
+  border: 1.5px solid #512da8;
+  box-shadow: 0 0 0 2px #ede7f6;
+}
+#sellModal .modal-content input[type="text"],
+#sellModal .modal-content input[type="number"],
+#sellModal .modal-content textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #bdbdbd;
+  border-radius: 7px;
+  font-size: 1.09rem;
+  background: #fafaff;
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+/* Removed stray closing brace that caused the error */
+#sellModal .modal-content input[type="text"]:focus,
+#sellModal .modal-content input[type="number"]:focus,
+#sellModal .modal-content textarea:focus {
+  border: 1.5px solid #512da8;
+  box-shadow: 0 0 0 2px #ede7f6;
+}
+#sellModal .modal-content textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+/* Style for all form section headings (Type, BHK, Bathrooms, etc.) */
+#sellModal .modal-content .form-section-label,
+#sellModal .modal-content label.section-heading {
+  display: block;
+  font-weight: 700;
+  color: #23236a;
+  font-size: 1.13rem;
+  margin-bottom: 7px;
+  margin-top: 18px;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+#sellModal .modal-content label {
+  font-weight: 600;
+  color: #2c2457;
+  margin-bottom: 1px;
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+}
+#sellModal .modal-content button.primary {
+  background: #ede7f6;
+  color: #1a237e;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.08rem;
+  font-weight: 500;
+  padding: 10px 0;
+  margin-top: 10px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+#sellModal .modal-content button.primary:hover {
+  background: #512da8;
+  color: #fff;
+}
+/* Center and style the modal overlay */
+#sellModal.modal {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44, 36, 94, 0.85);
+  z-index: 10000;
+  overflow-y: auto;
+}
+#sellModal.modal.show {
+  display: flex !important;
+}
+
+/* Style the modal content for better sizing */
+#sellModal .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 24px 24px 24px;
+  min-width: 520px;
+  max-width: 650px;
+  width: 600px;
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  box-shadow: 0 4px 32px rgba(44,36,94,0.18);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  overflow-y: auto;
+}
+
+/* Style the file input button */
+#sellModal input[type="file"]::-webkit-file-upload-button {
+  background: #512da8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#sellModal input[type="file"]::file-selector-button {
+  background: #512da8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#sellModal input[type="file"]::-webkit-file-upload-button:hover,
+#sellModal input[type="file"]::file-selector-button:hover {
+  background: #311b92;
+}
+
+/* Make the file input full width for better alignment */
+#sellModal input[type="file"] {
+  width: 60%;
+  margin-bottom: 16px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border: 1px solid #bdbdbd;
+  padding: 6px 0;
+}
+/* DEBUG: Make ad cards visible for troubleshooting */
+.property-card {
+  border: 2px solid #3c0087 !important;
+  background: #fffbe7 !important;
+  min-height: 120px;
+  margin-bottom: 16px;
+  color: #222;
+  z-index: 10;
+}
+/* --- Property Marketplace (home.html) UI --- */
+.main-header {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 24px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.main-header .logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #1a237e;
+  margin-right: 24px;
+}
+.main-header input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.main-header select {
+  padding: 8px 12px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.main-header .icon-btn, .main-header .primary {
+  margin-left: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #f5f5f5;
+  color: #333;
+  transition: background 0.2s;
+}
+.main-header .icon-btn:hover {
+  background: #e3e3e3;
+}
+.main-header .primary {
+  background: #1a237e;
+  color: #fff;
+  font-weight: bold;
+}
+.main-header .primary:hover {
+  background: #3949ab;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  padding: 32px 24px;
+  background: #fafbfc;
+}
+.property-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(60,60,60,0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+.property-card:hover {
+  box-shadow: 0 4px 16px rgba(60,60,60,0.13);
+}
+.property-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #e0e0e0;
+}
+.ad-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ad-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a237e;
+}
+.ad-price {
+  font-size: 1.2rem;
+  color: #388e3c;
+  font-weight: bold;
+}
+/* .ad-location { }
+   (removed empty rule for lint) */
+
+/* --- RESPONSIVE DESIGN PATCH --- */
+@media (max-width: 900px) {
+  .property-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 18px 6px;
+  }
+  .property-card img {
+    height: 120px;
+  }
+}
+@media (max-width: 600px) {
+  .main-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 4vw;
+    gap: 8px;
+  }
+  .property-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 10px 2vw;
+  }
+  .property-card {
+    min-width: 0;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px #bcb3f7;
+  }
+  .property-card img {
+    height: 90px;
+    border-radius: 6px 6px 0 0;
+  }
+  .property-info {
+    padding: 10px 8px;
+  }
+  .ad-title, .ad-price {
+    font-size: 1rem;
+  }
+  .property-action-fab-group {
+    top: 8px !important;
+    right: 8px !important;
+  }
+}
+/* fixed lint: removed stray closing brace */
+.fav-btn {
+  /* position: absolute; */
+  top: 12px;
+  right: 12px;
+  background: #fff;
+  border: 1px solid #bdbdbd;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  color: #e53935;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border 0.2s;
+}
+.fav-btn:hover {
+  background: #ffeaea;
+  border: 1px solid #e53935;
+}
+
+/* Modal for Sell Ad */
+.modal {
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px 24px;
+  min-width: 320px;
+  max-width: 95vw;
+  box-shadow: 0 2px 16px rgba(60,60,60,0.18);
+  position: relative;
+}
+.modal-content h2 {
+  margin-top: 0;
+  color: #1a237e;
+}
+.modal-content input, .modal-content textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.modal-content button.primary {
+  width: 100%;
+  margin-top: 8px;
+}
+.close {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+}
+.close:hover {
+  color: #e53935;
+}

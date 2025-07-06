@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Kridha Realty</title>
+  <link href="styles1.css" rel="stylesheet" type="text/css" />
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="auth.js"></script>
+  <script src="auth-ui.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Kridha Realty</title>
+  <link href="styles1.css" rel="stylesheet" type="text/css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="auth.js"></script>
+  <script src="auth-ui.js"></script>
+  <style>
+    .admin-container {
+      max-width: 900px;
+      margin: 3rem auto;
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---background-color--bg-primary,#fff);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      padding: 2.5rem 2rem;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .admin-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-logout {
+      font-size: 1rem;
+      color: #fff;
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      cursor: pointer;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .admin-table th, .admin-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    .admin-table th {
+      background: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---background-color--bg-secondary,#f6f6f6);
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-table select, .admin-table button {
+      font-size: 1rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.4rem;
+      border: 1px solid #ccc;
+      margin-right: 0.5rem;
+    }
+    .admin-table button {
+      background: #fff;
+      color: #3c0087;
+      border: 1px solid #3c0087;
+      transition: background 0.2s, color 0.2s;
+    }
+    .admin-table button:hover {
+      background: #3c0087;
+      color: #fff;
+    }
+    .admin-add-user {
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 0.7rem;
+      align-items: flex-end;
+    }
+    .admin-add-user input {
+      min-width: 100px;
+      box-sizing: border-box;
+    }
+    .admin-add-user select, .admin-add-user button {
+      min-width: 100px;
+      box-sizing: border-box;
+    }
+    .admin-add-user button {
+      height: 40px;
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+    }
+    .admin-add-user button {
+      height: 48px;
+      /* Match the input height exactly, adjust if needed */
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+    }
+    .admin-section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem 0;
+      color: var(--ai-gen-82921b10-4b39-48f0-b346-808cf4903d29-1751042785625---core-accent-color--accent-primary,#3c0087);
+    }
+    .admin-info {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .admin-container { padding: 1rem 0.5rem; }
+      .admin-header { flex-direction: column; gap: 1rem; }
+      .admin-add-user { flex-direction: column; align-items: stretch; }
+    }
+    /* Popup button row styling */
+    .popup-btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .popup-btn {
+      min-width: 110px;
+      font-size: 1rem;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.4rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .popup-btn.delete {
+      background: #3c0087;
+      color: #fff;
+    }
+    .popup-btn.delete:hover {
+      background: #23004c;
+    }
+    .popup-btn.cancel {
+      background: #eee;
+      color: #333;
+    }
+    .popup-btn.cancel:hover {
+      background: #d3d3d3;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <div class="admin-title">Admin Panel</div>
+      <button class="admin-logout" id="admin-logout">Logout</button>
+    </div>
+    <div class="admin-info">Manage users, roles, and privileges. Only admins can access this page.</div>
+    <div class="admin-section-title">Add New User</div>
+    <form id="admin-add-user" class="admin-add-user">
+      <input class="input w-input" id="add-name" type="text" required placeholder="Full Name" style="min-width:140px;flex:1 1 180px;" />
+      <input class="input w-input" id="add-mobile" type="text" required pattern="\d{10}" placeholder="Mobile Number" style="min-width:120px;max-width:160px;flex:0 1 140px;" />
+      <input class="input w-input" id="add-email" type="email" required placeholder="Email" style="min-width:180px;flex:2 1 220px;" />
+      <input class="input w-input" id="add-password" type="password" required placeholder="Password" style="min-width:120px;max-width:160px;flex:0 1 140px;" />
+      <select class="input w-input" id="add-role">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="button primary-button" type="submit">Add User</button>
+    </form>
+
+    <div class="admin-section-title">Export Users to Excel</div>
+    <form id="export-users-form" class="admin-add-user" style="margin-bottom:1.5rem;align-items:flex-end;">
+      <input type="date" id="export-start-date" class="input w-input" style="min-width:140px;flex:1 1 180px;" required />
+      <input type="date" id="export-end-date" class="input w-input" style="min-width:140px;flex:1 1 180px;" required />
+      <button type="submit" class="button primary-button">Export to Excel</button>
+    </form>
+
+    <div class="admin-section-title">All Users</div>
+    <div id="admin-users-list"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // Only allow admin
+    $(function() {
+      const user = localStorage.getItem('kridha_current_user');
+      if (!user) { window.location = 'index.html'; return; }
+      const u = JSON.parse(user);
+      if (u.role !== 'admin') { window.location = 'index.html'; return; }
+      renderAdminUsers();
+      $('#admin-logout').on('click', function() {
+        localStorage.removeItem('kridha_current_user');
+        window.location = 'index.html';
+      });
+      $('#admin-add-user').on('submit', async function(e) {
+        e.preventDefault();
+        const name = $('#add-name').val();
+        const mobile = $('#add-mobile').val();
+        const email = $('#add-email').val();
+        const password = $('#add-password').val();
+        const role = $('#add-role').val();
+        if (!/^\d{10}$/.test(mobile)) {
+          alert('Enter a valid 10-digit mobile number');
+          return;
+        }
+        const ok = await window.kridhaAuth.registerUser(mobile, email, password, name);
+        if (!ok) {
+          alert('Mobile or Email already registered');
+        } else {
+          await window.kridhaAuth.setUserRole(email, role);
+          await renderAdminUsers();
+          this.reset();
+        }
+      });
+
+      // Export users to Excel
+      $('#export-users-form').on('submit', async function(e) {
+        e.preventDefault();
+        const startDate = $('#export-start-date').val();
+        const endDate = $('#export-end-date').val();
+        if (!startDate || !endDate) {
+          alert('Please select both start and end dates.');
+          return;
+        }
+        let users = await window.kridhaAuth.getAllUsers();
+        // Exclude master admin from export
+        users = users.filter(u => (u.email || '').toLowerCase() !== 'admin@kridha.com');
+        // For admins, only include those with export checkbox checked
+        let exportAdmins = JSON.parse(localStorage.getItem('kridha_export_admins') || '{}');
+        users = users.filter(u => {
+          if (u.role === 'admin') {
+            return exportAdmins[u.email] !== false;
+          }
+          return true;
+        });
+        // If no user has createdAt, fallback to exporting all users, but add a warning row
+        let filtered = users.filter(u => !!u.createdAt);
+        let data;
+        if (filtered.length === 0) {
+          // Fallback: export all users (ignore date filter)
+          if (users.length === 0) {
+            alert('No users found.');
+            return;
+          }
+          if (!confirm('No user records have a creation date. Export all users?')) return;
+          data = [
+            { Name: 'WARNING: No users have a creation date. Exported all users, date filter ignored.' }
+          ];
+          data = data.concat(users.map(u => ({
+            Name: u.name || '',
+            Mobile: u.mobile || '',
+            Email: u.email || '',
+            Role: u.role || '',
+            'Created At': ''
+          })));
+        } else {
+          filtered = filtered.filter(u => {
+            const d = new Date(u.createdAt);
+            return d >= new Date(startDate) && d <= new Date(endDate + 'T23:59:59');
+          });
+          if (filtered.length === 0) {
+            alert('No users found in the selected date range.');
+            return;
+          }
+          data = filtered.map(u => ({
+            Name: u.name || '',
+            Mobile: u.mobile || '',
+            Email: u.email || '',
+            Role: u.role || '',
+            'Created At': u.createdAt ? new Date(u.createdAt).toLocaleString() : ''
+          }));
+        }
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Users');
+        XLSX.writeFile(wb, `users_${startDate}_to_${endDate}.xlsx`);
+      });
+    });
+
+    async function renderAdminUsers() {
+      const users = await window.kridhaAuth.getAllUsers();
+      // Separate users
+      const masterAdminEmail = 'admin@kridha.com';
+      const admins = users.filter(u => u.role === 'admin');
+      const usersOnly = users.filter(u => u.role !== 'admin');
+      // Master admin always on top
+      const masterAdmin = admins.find(u => u.email === masterAdminEmail);
+      const otherAdmins = admins.filter(u => u.email !== masterAdminEmail);
+
+      // Admins Table
+      let adminHtml = '<div class="admin-section-title">Admins</div>';
+      adminHtml += '<table class="admin-table"><thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Role</th><th>Created At</th><th>Include in Export</th><th>Actions</th></tr></thead><tbody>';
+      if (masterAdmin) {
+        adminHtml += `<tr style="background:#e8eaf6;"><td>${masterAdmin.name||''}</td><td>${masterAdmin.mobile||''}</td><td>${masterAdmin.email}</td><td>Admin</td><td></td><td></td><td></td></tr>`;
+      }
+      // Persist export selection in localStorage
+      let exportAdmins = JSON.parse(localStorage.getItem('kridha_export_admins') || '{}');
+      otherAdmins.forEach(u => {
+        const checked = exportAdmins[u.email] !== false ? 'checked' : '';
+        adminHtml += `<tr><td>${u.name||''}</td><td>${u.mobile||''}</td><td>${u.email}</td><td><select class='admin-role-select' data-email='${u.email}'><option value='admin'${u.role==='admin'?' selected':''}>Admin</option><option value='user'${u.role==='user'?' selected':''}>User</option></select></td><td>${u.createdAt ? new Date(u.createdAt).toLocaleString() : ''}</td><td><input type='checkbox' class='export-admin-checkbox' data-email='${u.email}' ${checked}></td><td>${u.email!==masterAdminEmail?`<button data-del="${u.email}">Delete</button>`:''}</td></tr>`;
+      });
+      adminHtml += '</tbody></table>';
+
+      // Users Table
+      let userHtml = '<div class="admin-section-title">Users</div>';
+      userHtml += '<table class="admin-table"><thead><tr><th>Name</th><th>Mobile</th><th>Email</th><th>Role</th><th>Created At</th><th>Actions</th></tr></thead><tbody>';
+      usersOnly.forEach(u => {
+        userHtml += `<tr><td>${u.name||''}</td><td>${u.mobile||''}</td><td>${u.email}</td><td><select class='user-role-select' data-email='${u.email}'><option value='user'${u.role==='user'?' selected':''}>User</option><option value='admin'${u.role==='admin'?' selected':''}>Admin</option></select></td><td>${u.createdAt ? new Date(u.createdAt).toLocaleString() : ''}</td><td><button data-del="${u.email}">Delete</button></td></tr>`;
+      });
+      userHtml += '</tbody></table>';
+
+      $('#admin-users-list').html(adminHtml + userHtml);
+
+      // Add admin password popup if not present
+      if ($('#role-popup').length === 0) {
+        $('body').append(`
+          <div id="role-popup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:9999;display:flex;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2rem 1.5rem 1.5rem 1.5rem;border-radius:1.1rem;box-shadow:0 4px 24px rgba(0,0,0,0.18);min-width:0;max-width:95vw;width:350px;text-align:center;">
+              <div id="role-popup-msg" style="margin-bottom:1.1rem;font-size:1.08rem;"></div>
+              <input id="role-popup-password" type="password" placeholder="Enter admin password" style="padding:0.5rem 1rem;margin-bottom:1.1rem;width:92%;border-radius:0.4rem;border:1px solid #ccc;font-size:1rem;" />
+              <div style="display:flex;justify-content:center;gap:1rem;margin-top:0.2rem;">
+                <button id="role-popup-confirm" style="background:#3c0087;color:#fff;padding:0.5rem 1.5rem;border:none;border-radius:0.4rem;min-width:90px;font-size:1rem;">Confirm</button>
+                <button id="role-popup-cancel" style="background:#eee;color:#333;padding:0.5rem 1.5rem;border:none;border-radius:0.4rem;min-width:90px;font-size:1rem;">Cancel</button>
+              </div>
+              <div id="role-popup-error" style="color:#c00;margin-top:1rem;font-size:0.98rem;"></div>
+            </div>
+          </div>
+        `);
+        // Always hide popup on load
+        $('#role-popup').hide();
+      }
+
+      // Role change with admin password popup (for both admins and users tables)
+      let pendingRoleChange = null;
+      // For users table
+      $('#admin-users-list .user-role-select').on('change', function() {
+        const email = $(this).data('email');
+        const role = $(this).val();
+        pendingRoleChange = { email, role };
+        $('#role-popup-msg').text(`Enter admin password to change role for ${email}`);
+        $('#role-popup-password').val('');
+        $('#role-popup-error').text('');
+        $('#role-popup').fadeIn(120, function() {
+          $('#role-popup-password').focus();
+        });
+      });
+      // For admins table (except master admin)
+      $('#admin-users-list .admin-role-select').on('change', function() {
+        const email = $(this).data('email');
+        const role = $(this).val();
+        pendingRoleChange = { email, role };
+        $('#role-popup-msg').text(`Enter admin password to change role for ${email}`);
+        $('#role-popup-password').val('');
+        $('#role-popup-error').text('');
+        $('#role-popup').fadeIn(120, function() {
+          $('#role-popup-password').focus();
+        });
+      });
+      // Enter key submits password
+      $(document).off('keydown.rolepopup').on('keydown.rolepopup', function(e) {
+        if ($('#role-popup').is(':visible') && e.key === 'Enter') {
+          if ($('#role-popup-password').is(':focus')) {
+            $('#role-popup-confirm').click();
+            e.preventDefault();
+          }
+        }
+      });
+      $('#role-popup-cancel').off('click').on('click', function() {
+        $('#role-popup').fadeOut(120);
+        renderAdminUsers(); // revert select
+      });
+      $('#role-popup-confirm').off('click').on('click', async function() {
+        let password = $('#role-popup-password').val().trim();
+        if (!password) {
+          $('#role-popup-error').text('Please enter admin password.');
+          return;
+        }
+        // Always require master admin password for role change
+        const email = 'admin@kridha.com';
+        const res = await fetch(`${API_BASE}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (!res.ok) {
+          $('#role-popup-error').text('Incorrect admin password.');
+          return;
+        }
+        // Change role
+        await window.kridhaAuth.setUserRole(pendingRoleChange.email, pendingRoleChange.role);
+        $('#role-popup').fadeOut(120);
+        renderAdminUsers();
+      });
+      // Delete user with custom popup
+      $('#admin-users-list button[data-del]').on('click', function() {
+        const email = $(this).data('del');
+        showDeletePopup(email);
+      });
+
+      // Add popup HTML if not present
+      if ($('#delete-popup').length === 0) {
+        $('body').append(`
+          <div id="delete-popup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:9999;display:flex;align-items:center;justify-content:center;">
+            <div style="background:#fff;padding:2rem 2.5rem;border-radius:1rem;box-shadow:0 4px 24px rgba(0,0,0,0.18);min-width:300px;text-align:center;max-width:90vw;">
+              <div id="delete-popup-msg" style="margin-bottom:1.5rem;font-size:1.1rem;"></div>
+              <div class="popup-btn-row">
+                <button id="delete-popup-confirm" class="popup-btn delete">Delete</button>
+                <button id="delete-popup-cancel" class="popup-btn cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        `);
+        // Always hide popup on load
+        $('#delete-popup').hide();
+      }
+
+      // Popup logic
+      window.showDeletePopup = function(email) {
+        $('#delete-popup-msg').text('Delete user ' + email + '?');
+        $('#delete-popup').stop(true, true).fadeIn(120);
+        // Remove previous handlers to avoid stacking
+        $('#delete-popup-confirm').off('click').on('click', async function() {
+          await window.kridhaAuth.deleteUser(email);
+          $('#delete-popup').fadeOut(120);
+          renderAdminUsers();
+        });
+        $('#delete-popup-cancel').off('click').on('click', function() {
+          $('#delete-popup').fadeOut(120);
+        });
+      }
+
+      // Handle export admin checkbox changes
+      $('#admin-users-list .export-admin-checkbox').off('change').on('change', function() {
+        let exportAdmins = JSON.parse(localStorage.getItem('kridha_export_admins') || '{}');
+        const email = $(this).data('email');
+        exportAdmins[email] = $(this).is(':checked');
+        localStorage.setItem('kridha_export_admins', JSON.stringify(exportAdmins));
+      });
+    }
+  </script>
+</body>
+</html>

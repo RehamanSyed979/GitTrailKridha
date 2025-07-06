@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Favorites - Kridha Realty</title>
+  <link rel="stylesheet" href="styles1.css">
+  <link rel="stylesheet" href="ads.css">
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <script src="auth-ui.js" defer></script>
+  <script src="ads.js" defer></script>
+  <style>
+    .favorites-title { font-size:2rem; font-weight:700; color:#3c0087; margin:2rem 0 1.5rem 0; text-align:center; }
+    .property-grid { justify-content:center; }
+  </style>
+</head>
+<body style="background:#e3eaf6;min-height:100vh;font-family:'Manrope', 'DM Sans', Arial, sans-serif;">
+  <div class="nav secondary-nav" style="background:transparent;box-shadow:none;">
+    <div class="nav-container w-nav" style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 0 1.2rem 0;">
+      <div class="nav-left" style="display:flex;align-items:center;gap:0.7rem;">
+        <div class="nav-logo-icon" style="width:38px;height:38px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #bcb3f7;">
+          <svg width="28" height="28" viewBox="0 0 33 33" fill="none"><path d="M28,0H5C2.24,0,0,2.24,0,5v23c0,2.76,2.24,5,5,5h23c2.76,0,5-2.24,5-5V5c0-2.76-2.24-5-5-5ZM29,17c-6.63,0-12,5.37-12,12h-1c0-6.63-5.37-12-12-12v-1c6.63,0,12-5.37,12-12h1c0,6.63,5.37,12,12,12v1Z" fill="#3c0087"/></svg>
+        </div>
+        <div class="paragraph-lg utility-margin-bottom-0" style="font-size:1.35rem;font-weight:700;color:#3c0087;letter-spacing:0.5px;">Kridha Realty</div>
+      </div>
+      <div class="custom-nav-right" style="gap:1.1rem;display:flex;align-items:center;">
+        <a href="home.html" class="button secondary-button w-button" style="min-width:90px;padding:0.55rem 1.1rem;font-size:1rem;text-decoration:none;">Home</a>
+        <a href="favorites.html" class="button primary-button w-button" style="min-width:90px;padding:0.55rem 1.1rem;font-size:1rem;text-decoration:none;">&#10084; Favorites</a>
+        <button id="profileBtn" class="button secondary-button w-button" style="min-width:80px;padding:0.55rem 1.1rem;font-size:1rem;">👤 Profile</button>
+        <button id="sellBtn" class="button primary-button w-button" style="min-width:80px;padding:0.55rem 1.3rem;font-size:1.05rem;margin-right:0;">+ Sell</button>
+      </div>
+    </div>
+  </div>
+  <main style="max-width:1200px;margin:2.5rem auto 0 auto;">
+    <div class="favorites-title">My Favorite Properties</div>
+    <div id="favoritesGrid" class="property-grid"></div>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.currentUser) {
+        try {
+          const u = localStorage.getItem('kridha_current_user');
+          if (u) window.currentUser = JSON.parse(u);
+        } catch(e) { window.currentUser = null; }
+      }
+      if (!window.currentUser || !window.currentUser._id) {
+        document.getElementById('favoritesGrid').innerHTML = '<p style="text-align:center;color:#b00;font-size:1.2rem;">Please log in to view your favorites.</p>';
+        return;
+      }
+      fetch(`${window.API_BASE_URL}/api/favorites?userId=${window.currentUser._id}`)
+        .then(res => res.json())
+        .then(ads => {
+          if (!ads.length) {
+            document.getElementById('favoritesGrid').innerHTML = '<p style="text-align:center;color:#555;font-size:1.1rem;">No favorite properties found.</p>';
+            return;
+          }
+          document.getElementById('favoritesGrid').innerHTML = ads.map(ad => `
+            <div class=\"property-card\">
+              <img src=\"${(ad.images && ad.images[0]) || 'images/image1.avif'}\" alt=\"Property Image\">
+              <div class=\"property-info\">
+                <div class=\"property-title\">${ad.title}</div>
+                <div class=\"property-price\">₹ ${ad.price && !isNaN(ad.price) ? Number(ad.price).toLocaleString() : ''}</div>
+                <button class=\"fav-btn active\" data-id=\"${ad._id}\">&#10084;</button>
+              </div>
+            </div>
+          `).join('');
+          document.querySelectorAll('.fav-btn').forEach(btn => {
+            btn.onclick = () => {
+              fetch(`${window.API_BASE_URL}/api/favorite`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: window.currentUser._id, adId: btn.dataset.id })
+              }).then(() => location.reload());
+            };
+          });
+        });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Profile - Kridha Realty</title>
+  <link rel="stylesheet" href="styles1.css">
+  <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
+  <script>
+    window.API_BASE_URL = "http://13.201.192.95";
+  </script>
+  <style>
+    .profile-container { max-width: 520px; margin: 2rem auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px #0001; padding: 2.5rem 2rem; }
+    .profile-header { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; }
+    .profile-avatar { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #bcb3f7; background: #ece8ff; }
+    .profile-avatar-upload { display: flex; flex-direction: column; gap: 0.5rem; }
+    .profile-avatar-btns { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .profile-form label { font-weight: 500; margin-top: 1.2rem; display: block; }
+    .profile-form input { width: 100%; padding: 0.7rem; border-radius: 6px; border: 1px solid #ccc; margin-top: 0.3rem; font-size: 1rem; }
+    .profile-form .form-row { margin-bottom: 1.2rem; }
+    .profile-form .form-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+    .profile-form .button { min-width: 120px; }
+    .profile-section-title { font-size: 1.2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.7rem; }
+    .danger-zone { background: #fff0f0; border: 1px solid #fbb; border-radius: 8px; padding: 1.2rem; margin-top: 2.5rem; }
+    .danger-zone .button { background: #c00; color: #fff; border: none; }
+    .profile-success, .profile-error { margin-top: 1rem; font-size: 1rem; }
+    .profile-success { color: #2a8a2a; }
+    .profile-error { color: #c00; }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="auth.js"></script>
+  <script src="profile.js"></script>
+</head>
+<body style="background:#f5f7fa;">
+  <div class="profile-container">
+    <h2 style="margin-bottom:1.5rem;">Your Profile</h2>
+    <div class="profile-header">
+      <img id="profile-avatar" class="profile-avatar" src="images/image1.avif" alt="Profile Picture">
+      <div class="profile-avatar-upload">
+        <input type="file" id="avatar-upload" accept="image/*" style="display:none;">
+        <div class="profile-avatar-btns">
+          <button class="button secondary-button" id="change-avatar-btn" type="button">Change Photo</button>
+          <button class="button" id="remove-avatar-btn" type="button" style="background:#eee;color:#c00;">Remove</button>
+        </div>
+        <span id="avatar-upload-status" class="profile-success" style="display:none;"></span>
+      </div>
+    </div>
+    <form id="profile-form" class="profile-form">
+      <div class="form-row">
+        <label for="profile-username">Username</label>
+        <input type="text" id="profile-username" name="username" required>
+      </div>
+      <div class="form-row">
+        <label for="profile-email">Email</label>
+        <input type="email" id="profile-email" name="email" required>
+      </div>
+      <div class="form-row">
+        <label for="profile-password">Change Password</label>
+        <input type="password" id="profile-password" name="password" placeholder="New password">
+      </div>
+      <div class="form-actions">
+        <button class="button primary-button" type="submit">Save Changes</button>
+        <button class="button secondary-button" type="button" id="cancel-profile-edit">Cancel</button>
+      </div>
+      <div id="profile-form-status" class="profile-success" style="display:none;"></div>
+      <div id="profile-form-error" class="profile-error" style="display:none;"></div>
+    </form>
+    <div id="admin-panel-row" style="text-align:center;display:none;margin-bottom:1.5rem;">
+      <button class="button primary-button" id="adminPanelBtn" type="button" style="background:#c2185b;color:#fff;padding:10px 32px;border-radius:6px;font-size:1em;">Admin Panel</button>
+    </div>
+    <div class="profile-section-title">Advanced</div>
+    <div class="form-row">
+      <label for="profile-current-password">Current Password (for sensitive changes)</label>
+      <input type="password" id="profile-current-password" name="current-password" placeholder="Enter current password to confirm">
+    </div>
+    <div class="danger-zone">
+      <div style="font-weight:600;margin-bottom:0.7rem;">Danger Zone</div>
+      <button class="button" id="delete-account-btn" type="button">Delete Account</button>
+      <div id="delete-account-status" class="profile-success" style="display:none;"></div>
+      <div id="delete-account-error" class="profile-error" style="display:none;"></div>
+    </div>
+    <div style="text-align:center;margin-top:2.5rem;">
+      <button class="button primary-button" id="logout-btn" type="button" style="background:#512da8;color:#fff;padding:10px 32px;border-radius:6px;font-size:1em;">Logout</button>
+    </div>
+  </div>
+  <script>
+    document.getElementById('logout-btn').onclick = function() {
+      localStorage.removeItem('kridha_current_user');
+      if (window.currentUser) window.currentUser = null;
+      window.location.href = 'index.html';
+    };
+    // Profile page JS logic will be in profile.js
+  </script>
+</body>
+</html>
