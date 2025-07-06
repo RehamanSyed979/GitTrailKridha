@@ -1,11 +1,15 @@
 
 // Backend API base URL (dynamic for local/dev/prod)
+// Set API base URL for both local and production
+const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app']; // add more if needed
 let API_BASE = '';
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+if (PROD_HOSTNAMES.includes(window.location.hostname)) {
+  API_BASE = 'https://13.201.192.95/api';
+} else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
   API_BASE = 'http://localhost:3000/api';
 } else {
-  // Always use EC2 backend in production
-  API_BASE = window.API_BASE_URL ? window.API_BASE_URL + '/api' : 'http://13.201.192.95/api';
+  // fallback: use production API for any other deployed domain
+  API_BASE = 'https://13.201.192.95/api';
 }
 
 async function registerUser(mobile, email, password, name) {

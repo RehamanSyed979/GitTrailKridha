@@ -14,8 +14,17 @@
     <!-- jQuery must load before any script that uses $ -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      // Set API base URL for all frontend scripts
-      window.API_BASE_URL = "http://13.201.192.95";
+      // Robust API base URL logic for all frontend scripts
+      (function() {
+        const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app'];
+        if (PROD_HOSTNAMES.includes(window.location.hostname)) {
+          window.API_BASE_URL = 'https://13.201.192.95/api';
+        } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          window.API_BASE_URL = 'http://localhost:3000/api';
+        } else {
+          window.API_BASE_URL = 'https://13.201.192.95/api';
+        }
+      })();
     </script>
     <script src="auth.js"></script>
     <script src="auth-ui.js"></script>
