@@ -1,13 +1,5 @@
-// Set API base URL for both local and production
-const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app']; // add more if needed
-if (PROD_HOSTNAMES.includes(window.location.hostname)) {
-  window.API_BASE_URL = 'https://13.201.192.95';
-} else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-  window.API_BASE_URL = 'http://localhost:3000';
-} else {
-  // fallback: use production API for any other deployed domain
-  window.API_BASE_URL = 'https://13.201.192.95';
-}
+
+// Use window.API_BASE_URL set in HTML for all API calls
 
 $(function() {
   // Modal open/close
