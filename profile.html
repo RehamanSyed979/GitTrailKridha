@@ -3,7 +3,7 @@
 <head>
   <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
   <script>
-    // Robust API base URL logic for all frontend scripts
+    // Robust API base URL logic for all frontend scripts (NO /api at end)
     (function() {
       const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app'];
       if (PROD_HOSTNAMES.includes(window.location.hostname)) {
@@ -20,19 +20,7 @@
   <title>View Profile - Kridha Realty</title>
   <link rel="stylesheet" href="styles1.css">
   <!-- PATCH: Set API_BASE_URL for all frontend scripts -->
-  <script>
-    // Robust API base URL logic for all frontend scripts
-    (function() {
-      const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app'];
-      if (PROD_HOSTNAMES.includes(window.location.hostname)) {
-        window.API_BASE_URL = 'https://13.201.192.95/api';
-      } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        window.API_BASE_URL = 'http://localhost:3000/api';
-      } else {
-        window.API_BASE_URL = 'https://13.201.192.95/api';
-      }
-    })();
-  </script>
+
   <style>
     .profile-container { max-width: 520px; margin: 2rem auto; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px #0001; padding: 2.5rem 2rem; }
     .profile-header { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; }
