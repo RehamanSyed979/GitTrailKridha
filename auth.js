@@ -4,12 +4,12 @@
 const PROD_HOSTNAMES = ['git-trail-kridha.vercel.app']; // add more if needed
 let API_BASE = '';
 if (PROD_HOSTNAMES.includes(window.location.hostname)) {
-  API_BASE = 'https://13.201.192.95/api';
+  API_BASE = 'https://13.203.78.106/api';
 } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
   API_BASE = 'http://localhost:3000/api';
 } else {
   // fallback: use production API for any other deployed domain
-  API_BASE = 'https://13.201.192.95/api';
+  API_BASE = 'https://13.203.78.106/api';
 }
 
 async function registerUser(mobile, email, password, name) {
